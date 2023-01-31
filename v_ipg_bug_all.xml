@@ -1,0 +1,2126 @@
+﻿<Template Type="Template" Name="v_ipg_bug_all" Id="4785f0be-6909-408f-9c34-c3016cf85e83">
+  <TemplateName Type="String">internalview</TemplateName>
+  <TemplateVersion Type="Version">1.0.0</TemplateVersion>
+  <ParentId Type="Guid">fc76f402-8029-4b76-906f-cc1f6934e618</ParentId>
+  <Description Type="String">
+  </Description>
+  <Owner Type="String">mssisodi</Owner>
+  <UpdatedBy Type="String">mssisodi</UpdatedBy>
+  <Configuration Type="Dictionary(String, Object)">
+    <Add Type="DictionaryEntry">
+      <Key Type="String">CommandText</Key>
+      <Value Type="String">
+		  Select
+		  [tenant]
+		  ,ww
+		  ,closed_date
+		  ,repo_modified_wwd
+		  ,[original_family]
+		  ,[family]
+		  ,priority
+		  ,[ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  ,[tag]
+		  ,[status]
+		  ,[status_detail]
+		  ,[project]
+		  ,[SoC Die]
+		  ,[id]
+		  ,[lineage]
+		  ,[original_lineage]
+		  ,[title]
+		  ,[ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,[ww_updated_date]
+		  ,[bugeco.env_found]
+		  ,[bugeco.team_found]
+		  ,[bug_category]
+		  ,[bugeco.bug_class]
+		  ,from_tenant
+		  ,from_subject
+		  ,[bugeco.type]
+		  ,[component]
+		  ,url
+		  /*
+		  adding into this section the ccb fieds that are common across server and sip teneants first
+		  */
+		  ,[ccb_change_scope]
+		  ,[ccb_eta]
+		  ,[ccb_order]
+		  ,[ccb_por]
+		  ,[ccb_prq_gating]
+		  ,[ccb_questionnaire]
+		  ,[ccb_status]
+		  ,[ccb_wontfix_action]
+		  ,[ccb_wontfix_reason]
+		  ,[ccb_workaround]
+		  ,[ccb_proposal]
+		  ,[ccb_mode]
+		  ,[ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,[ww_defined_date]
+		  ,[ww_approved_date]
+		  ,ww_predrop_closure_date_sdg
+		  ,[currentww]
+		  ,[currentmonth]
+		  ,[currentyear]
+		  ,[subip_family]
+		  ,[subip_supplier]
+		  ,[bugeco.release_found]
+		  ,supplier_org
+		  ,[is_PreSiPostSi]
+		  ,[IsCount]
+		  ,[lineage_final]
+		  ,IsSubIP
+		  ,[sub_bugcategory]
+		  ,retro_status
+		  ,retro_ip_escape
+		  ,retro_global_learning
+		  ,retro_global_action
+		  ,retro_analysis
+		  ,retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[ww_repo_modified_date]
+		  ,[BugFixedDoneDate]
+		  ,[generation]
+		  ,[IsRealBug]
+		  ,milestone
+		  ,[totalID]
+		  ,[responseSLA]
+		  ,[resolutionSLA]
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+		  ,[sla_response_met]
+		  ,[sla_resolution_met]
+		  ,submitted_by
+		  ,updated_by
+		  ,[ingredient]
+		  ,[ww_future_date]
+		  ,drop_fix
+		  ,[repo_modified_date]
+		  ,bar_type
+		  ,
+		  /*Opening for cases for applying bug found by test chip*/
+		  /*Cases for the sip tenant*/
+		  CASE
+		  WHEN tenant = 'sip'
+		  THEN
+
+		  CASE WHEN from_tenant = 'sighting_central' and [bugeco.env_found] = 'fpga' and [ip_supplier] = 'Edge Accelerator IP' THEN 'HW PreSiBug Found by IP'
+		  WHEN [ingredient] = 'ip.typec.iom.fw.patch' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') and  [bug_category] IN ( 'fw', 'sw' ) THEN'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') and  [bug_category] IN ( 'fw', 'sw' ) THEN'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') THEN 'HW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') THEN 'HW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' and  [bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bugeco.env_found] like '%silicon%'  THEN 'HW PostSiBug Found by IP'
+		  WHEN testchip.flag=1 and([bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting' ) and  [bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN ([bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting' ) and  [bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN  testchip.flag=1 and ([bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting') THEN 'HW PreSiBug Found by TestChip'
+		  WHEN  [bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting' THEN 'HW PreSiBug Found by SoC'
+		  WHEN [bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END
+
+		  /*Cases for the heia_soc tenant for Tiger Lake*/
+		  WHEN tenant = 'heia_soc' and component like '%tgl%'
+		  THEN
+		  CASE
+		  WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') and (component like '%iomfw.ip.typec.iom.fw%'or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa')THEN  'SW/FW PreSiBug Found by IP'
+		  WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec')THEN  'HW PreSiBug Found by IP'
+		  WHEN testchip.flag =1 and [bugeco.env_found] like '%silicon%' and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN testchip.flag=1 and ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation') THEN 'HW PreSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation' THEN 'HW PreSiBug Found by SoC'
+		  WHEN component like '%iomfw.ip.typec.iom.fw%'or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END
+
+		  /*Cases for the heia_soc tenant for Ice lake*/
+		  WHEN tenant = 'heia_soc' and component like '%icl%'
+		  THEN
+		  CASE      WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') and component like '%iom.fw%' THEN  'SW/FW PreSiBug Found by IP'
+		  WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') THEN  'HW PreSiBug Found by IP'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like '%silicon%' and component like '%iom.fw%' THEN 'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' and component like '%iom.fw%' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and component like '%iom.fw%' THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and component like '%iom.fw%' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN testchip.flag=1 and ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation') THEN 'HW PreSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation' THEN 'HW PreSiBug Found by SoC'
+		  WHEN component like '%iom.fw%' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END
+
+		  /*Cases for the hip tenant*/
+		  WHEN tenant = 'hip'
+		  THEN
+		  CASE
+		  WHEN testchip.flag=1 and [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' and [bug_category] = 'Firmware' THEN 'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' and [bug_category] = 'Firmware' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' THEN 'HW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like'%silicon%' and [bug_category] = 'Firmware' THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'HW PostSiBug Found by IP'
+		  WHEN testchip.flag=1 and[bugeco.team_found] like '%SoC%' and [bug_category] = 'Firmware' THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN [bugeco.team_found] like '%SoC%' and [bug_category] = 'Firmware' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN testchip.flag=1 and[bugeco.team_found] like '%SoC%' THEN 'HW PreSiBug Found by TestChip'
+		  WHEN [bugeco.team_found] like '%SoC%' THEN 'HW PreSiBug Found by SoC'
+		  WHEN [bug_category] = 'Firmware' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END
+
+		  /*Cases for the ip_fw_sw_sensing tenant*/
+		  WHEN tenant= 'ip_fw_sw_sensing'
+		  THEN
+		  CASE
+		  /*WHEN [bugeco.team_found] = 'COE' AND [bugeco.env_found] LIKE'%silicon%' THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bugeco.team_found] = 'COE' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN [ip_fw_sw_sensing.bug.submitter_org] = 'CCG-CCE'  AND [bugeco.env_found] LIKE'%silicon%' THEN 'SW/FW PostSiBug Found by Customers'
+		  WHEN [ip_fw_sw_sensing.bug.submitter_org] = 'CCG-CCE' THEN 'SW/FW PreSiBug Found by Customers'*/
+		  WHEN [old_is_found_bySoC] not LIKE '%SoC%' THEN [old_is_found_bySoC]
+		  WHEN testchip.flag=1 and [bugeco.env_found] LIKE'%silicon%' THEN 'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.env_found] LIKE'%silicon%' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag =1 THEN  'SW/FW PreSiBug Found by TestChip'
+		  ELSE 'SW/FW PreSiBug Found by SoC'
+		  END
+
+		  /*Cases for the sfip tenant*/
+		  WHEN tenant = 'sfip'
+		  THEN
+		  CASE WHEN [bugeco.team_found] in ('customer','WOS') and [bugeco.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by Customers'
+		  WHEN [bugeco.team_found] in ('customer','WOS') THEN 'SW/FW PreSiBug Found by Customers'
+		  WHEN testchip.flag=1 and [bugeco.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') and [bugeco.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by TestChip'
+		  WHEN [bugeco.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') and [bugeco.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and [bugeco.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN [bugeco.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by IP'
+		  ELSE 'SW/FW PreSiBug Found by IP'
+		  END
+
+		  /*Cases for the tenant server in the SDG HBMIO family*/
+		  WHEN tenant = 'server' and family = 'SDG HBMIO' and bug_category in ('fw', 'fw.workaround')
+		  THEN
+		  CASE
+		  WHEN [bugeco.env_found] LIKE '%Silicon%'
+		  AND ( [bugeco.release_found] = ''
+		  OR [bugeco.release_found] IS NULL
+		  OR [bugeco.release_found] LIKE '%unknown%'
+		  OR [bugeco.release_found] = 'ip-internal' ) THEN
+		  'PostSiBug NoSoC'
+		  WHEN [bugeco.release_found] = ''
+		  OR [bugeco.release_found] IS NULL
+		  OR [bugeco.release_found] LIKE '%unknown%'
+		  OR [bugeco.release_found] = 'ip-internal'THEN
+		  'SW/FW PreSiBug Found by IP'
+		  WHEN testchip.flag=1 and supplier_org &lt;&gt; 'IPG'   AND [bugeco.env_found] LIKE '%Silicon%' THEN   'SW/FW PostSiBug Found by TestChip'
+		  WHEN supplier_org &lt;&gt; 'IPG'   AND [bugeco.env_found] LIKE '%Silicon%' THEN   'SW/FW PostSiBug Found by SoC'
+		  WHEN testchip.flag=1 and supplier_org &lt;&gt; 'IPG' THEN 'SW/FW PreSiBug Found by TestChip'
+		  WHEN supplier_org &lt;&gt; 'IPG' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN supplier_org = 'IPG'
+		  AND [bugeco.env_found] LIKE '%Silicon%' THEN 'PostSiBug NoSoC'
+		  WHEN supplier_org = 'IPG' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN [bugeco.env_found] LIKE '%Silicon%' THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END
+
+		  /*Case for all other families in the server tenant*/
+		  WHEN tenant= 'server'
+		  THEN
+
+		  CASE WHEN [bugeco.env_found] like '%Silicon%' and ([bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%'or [bugeco.release_found] = 'ip-internal') THEN 'PostSiBug NoSoC'
+		  WHEN  [bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%' or [bugeco.release_found] = 'ip-internal' THEN 'HW PreSiBug Found by IP'
+		  WHEN   testchip.flag=1 and supplier_org &lt;&gt; 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'HW PostSiBug Found by TestChip'
+		  WHEN   supplier_org &lt;&gt; 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN   testchip.flag=1 and supplier_org &lt;&gt; 'IPG' THEN 'HW PreSiBug Found by TestChip'
+		  WHEN   supplier_org &lt;&gt; 'IPG' THEN 'HW PreSiBug Found by SoC'
+		  WHEN   supplier_org = 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  WHEN   supplier_org = 'IPG' THEN 'HW PreSiBug Found by IP'
+		  WHEN  [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END
+
+
+		  ELSE null
+		  END as [is_found_bySoc]
+		  , support_type
+		  From
+		  (
+
+		  /*sip tenant*/
+
+		  select
+		  [tenant]
+		  ,ww
+		  ,closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  /*
+		  , CASE WHEN [component] like '%subip%' and  ([sip.bugeco.subip_family]is null or  [sip.bugeco.subip_family] = '') THEN family
+		  WHEN [component] like '%subip%' THEN [sip.bugeco.subip_family]
+		  WHEN [component] not like '%subip%' and family in ('cAVS 1.5', 'cAVS 1.8', 'cAVS 1.0')  THEN 'cAVS'
+		  ELSE family
+		  END as [family]
+		  */
+		  ,[family]
+		  ,priority
+		  ,CASE WHEN [component] like '%subip%' and ( [sip.bugeco.subip_supplier] is null or [sip.bugeco.subip_supplier]='')THEN [sip.bugeco.ip_supplier]
+		  WHEN [component] like '%subip%' THEN [sip.bugeco.subip_supplier]
+		  ELSE [sip.bugeco.ip_supplier]
+		  END as [ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  , [tag]
+		  ,[status]
+		  ,[sip.bugeco.status_detail] as [status_detail]
+		  ,[sip.bugeco.project] as [project]
+		  ,[sip.bugeco.project] as [SoC Die]
+		  ,[id]
+		  ,[lineage]
+		  ,[sip.bugeco.original_lineage] as [original_lineage]
+		  ,[title]
+		  , [ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww, [updated_date]) as ww_updated_date
+		  ,[bugeco.env_found]
+		  ,[bugeco.team_found]
+		  , [sip.bugeco.bug_category] as [bug_category]
+		  ,[bugeco.bug_class]
+		  ,from_tenant
+		  , from_subject
+		  ,CASE WHEN [bugeco.type] ='enhancement' THEN 'enhancement' ELSE 'bug' END as[bugeco.type]
+		  ,component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + [id] url
+		  /*
+		  adding into this section the ccb fieds that are common across server and sip teneants first
+		  */
+		  ,[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,[bugeco.ccb_eta] as [ccb_eta]
+		  ,[bugeco.ccb_order] as [ccb_order]
+		  ,[bugeco.ccb_por] as [ccb_por]
+		  ,[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,[bugeco.ccb_status] as [ccb_status]
+		  ,[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,[sip.bugeco.ccb_proposal] as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,[sip.bugeco.subip_family] as [subip_family]
+		  ,[sip.bugeco.subip_supplier] as [subip_supplier]
+		  ,[bugeco.release_found]
+		  ,null as supplier_org
+		  ,CASE WHEN [sip.bugeco.ingredient] = 'ip.typec.iom.fw.patch' THEN 'PreSiBugs'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE WHEN from_tenant = 'sighting_central' and [bugeco.env_found] = 'fpga' and [sip.bugeco.ip_supplier] = 'Edge Accelerator IP' THEN 'HW PreSiBug Found by IP'
+		  WHEN [sip.bugeco.ingredient] = 'ip.typec.iom.fw.patch' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') and  [sip.bugeco.bug_category] IN ( 'fw', 'sw' ) THEN'SW/FW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' and ([bugeco.team_found] like 'ext%' or [bugeco.team_found] = 'sighting') THEN 'HW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' and  [sip.bugeco.bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bugeco.env_found] like '%silicon%'  THEN 'HW PostSiBug Found by IP'
+		  WHEN ([bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting' ) and  [sip.bugeco.bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN  [bugeco.team_found] like 'ext%' or  [bugeco.team_found] = 'sighting' THEN 'HW PreSiBug Found by SoC'
+		  WHEN [sip.bugeco.bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END as [old_is_found_bySoc]
+		  ,CASE WHEN [bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  ,CASE WHEN [sip.bugeco.original_lineage] is not null or [sip.bugeco.original_lineage]&lt;&gt; '' THEN [sip.bugeco.original_lineage]
+		  ELSE lineage END as [lineage_final]
+		  ,CASE WHEN component like 'subip%' THEN 'SubIP' ELSE 'IP' END as IsSubIP
+		  ,CASE WHEN [sip.bugeco.bug_category] = 'arch' THEN 'Arch'
+		  WHEN [sip.bugeco.bug_category] in ('dynamo','fpga','rdl', 'tfm') THEN 'Collateral'
+		  WHEN [sip.bugeco.bug_category]  in ('hw','phy','rtl','sd','upf') THEN 'Functional'
+		  WHEN [sip.bugeco.bug_category]  in ('sandbox', 'verif', 'vip') THEN 'VAL'
+		  WHEN [sip.bugeco.bug_category]  ='doc' THEN 'DOC'
+		  WHEN [sip.bugeco.bug_category] IN ( 'fw', 'sw' ) THEN 'SW/FW'
+		  WHEN [sip.bugeco.bug_category] in ('tracking', 'support') THEN 'support'
+		  WHEN [sip.bugeco.bug_category] in ('INVALID: change the component','subip','other','unknown') or [sip.bugeco.bug_category] is NULL or [sip.bugeco.bug_category] = '' THEN 'Other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,[sip.bugeco.retro_status] as retro_status
+		  ,[sip.bugeco.retro_ip_escape] as retro_ip_escape
+		  ,[sip.bugeco.retro_global_learning] as retro_global_learning
+		  ,[sip.bugeco.retro_global_action] as retro_global_action
+		  ,[sip.bugeco.retro_analysis] as retro_analysis
+		  ,[sip.bugeco.retro_learnings] as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,[sip.bugeco.ip_gen] as [generation]
+		  ,CASE WHEN status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected' and  [sip.bugeco.status_detail] in ('wont_fix', 'future_project', 'future_stepping')) THEN 1 ELSE 0 END IsRealBug
+		  ,[sip.bugeco.milestone] as milestone
+		  ,1 as [totalID]
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,[sip.bugeco.ingredient] as [ingredient]
+		  ,[sip.bugeco.ww_future] as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,[sip.bugeco.bar_type] as bar_type
+		  ,null as support_type
+		  from [DW.sip.bugeco]
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and family in (select old_family from ipg_old_family_cached)
+		  and ([sip.bugeco.release_status] not like '%trunk%' or [sip.bugeco.release_status] = '' or [sip.bugeco.release_status] is null)
+		  /*and ([sip.bugeco.bug_category] not in ('tracking', 'support') or [sip.bugeco.bug_category]  is null or [sip.bugeco.bug_category]  = '')*/
+		  and (([bugeco.team_found]&lt;&gt; 'ext.tcss.icl' and [bugeco.team_found] &lt;&gt; 'ext.tcss.tgl') or [bugeco.team_found] is null or [bugeco.team_found] = '')
+
+		  UNION ALL
+		  /*Tiger Lake Type C HW 2019 data only for 2019 baseline. Once we move to 2021, we can remove this data completely out */
+		  select
+		  [tenant]
+		  ,a.ww
+		  ,a.closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  ,'USB4_SS' as [family]
+		  ,priority
+		  ,'Consumer IO IP' as[ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  , [tag]
+		  ,status
+		  ,[status_reason] as[status_detail]
+		  ,family as [project]
+		  ,family as [SoC Die]
+		  ,a.[id]
+		  ,[lineage]
+		  ,null as [original_lineage]
+		  ,[title]
+		  , [ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as ww_updated_date
+		  ,[bugeco.env_found]
+		  ,[bugeco.team_found]
+		  ,CASE WHEN component like '%iomfw.ip.typec.iom.fw%'or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa' THEN 'SW/FW' ELSE [heia_soc.bugeco.category] END as [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,from_tenant
+		  , from_subject
+		  ,CASE WHEN [bugeco.type] ='enhancement' THEN 'enhancement' ELSE 'bug' END as[bugeco.type]
+		  ,component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + a.[id] url
+		  /*
+		  adding into this section the ccb fieds that are common across various teneants first
+		  */
+		  ,[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,[bugeco.ccb_eta] as [ccb_eta]
+		  ,[bugeco.ccb_order] as [ccb_order]
+		  ,[bugeco.ccb_por] as [ccb_por]
+		  ,[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,[bugeco.ccb_status] as [ccb_status]
+		  ,[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,[bugeco.release_found]
+		  ,null as supplier_org
+		  ,CASE WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') THEN 'PreSiBugs'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') and (component like '%iomfw.ip.typec.iom.fw%'or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa')THEN  'SW/FW PreSiBug Found by IP'
+		  WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec')THEN  'HW PreSiBug Found by IP'
+		  WHEN [bugeco.env_found] like '%silicon%' and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and (component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa') THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN [bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation' THEN 'HW PreSiBug Found by SoC'
+		  WHEN component like '%iomfw.ip.typec.iom.fw%'or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END as [old_is_found_bySoc]
+		  ,CASE WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') THEN 0
+		  WHEN [bugeco.env_found] like '%silicon%' and  from_tenant  ='heia_soc' and from_subject = 'sighting' THEN 1 ELSE 0 END as IsCount
+		  ,CASE WHEN ww_submitted_date&lt; '2020ww01' THEN null ELSE [lineage] END as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE WHEN component like '%iomfw.ip.typec.iom.fw%' or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa' THEN 'SW/FW'
+		  WHEN [heia_soc.bugeco.category]  in ('logic') THEN 'Functional'
+		  WHEN [heia_soc.bugeco.category]  in ('val') THEN 'VAL'
+		  WHEN [heia_soc.bugeco.category] is NULL or [heia_soc.bugeco.category] = '' THEN 'Other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,null as retro_status
+		  ,null  as retro_ip_escape
+		  ,null  as retro_global_learning
+		  ,null  as retro_global_action
+		  ,null  as retro_analysis
+		  ,null  as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,null as [generation]
+		  ,CASE WHEN status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected' and  [status_reason] in ('rejected.wont_fix', 'rejected.future_project', 'rejected.future_stepping')) THEN 1 ELSE 0 END as IsRealBug
+		  ,null as milestone
+		  ,1 as [totalID]
+		  , null as responseSLA
+		  , null as resolutionSLA
+		  ,null as [ww_sla_response_date]
+		  ,null as [ww_sla_resolution_date]
+		  ,null as [sla_response_date]
+		  ,null as [sla_resolution_date]
+		  ,null as [sla_response_met]
+		  ,null as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,null as  bar_type
+		  ,null as support_type
+
+		  from [DW.heia_soc.bugeco] a
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and [bugeco.type]='bug' /*this is old data so no need to bring in enhancement bug*/
+		  and (status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected' and  [status_reason] in ('rejected.wont_fix', 'rejected.future_project', 'rejected.future_stepping')))
+		  and component like '%tgl%' and component like '%typec%'
+		  and left(ww_submitted_date,4) ='2019'
+		  and release not like '%iomfw-tgl-trunk%'
+		  /* Comment these out to bring in FWSW bug
+		  and (component like '%iomfw.ip.typec.iom.fw%'
+		  or component = 'tgl.soc.typec.iom.fw#'or component = 'tgl.soc.typec.iom.fw.wa')
+		  */
+
+		  UNION ALL
+		  /*Ice Lake Type C HW 2019 data only for SoC filed Bug baseline. Once we remove this data out of the SQL once we move to 2021*/
+		  select
+		  [tenant]
+		  ,a.ww
+		  ,a.closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  ,'USB4_SS' as [family]
+		  ,priority
+		  ,'Consumer IO IP' as[ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  , [tag]
+		  ,status
+		  ,[status_reason] as[status_detail]
+		  ,family as [project]
+		  ,family as [SoC Die]
+		  ,a.[id]
+		  ,[lineage]
+		  ,null as [original_lineage]
+		  ,[title]
+		  , [ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as ww_updated_date
+		  ,[bugeco.env_found]
+		  ,[bugeco.team_found]
+		  , CASE WHEN component like '%iom.fw%' THEN 'SW/FW' ELSE [heia_soc.bugeco.category] END as [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,from_tenant
+		  , from_subject
+		  ,CASE WHEN [bugeco.type] ='enhancement' THEN 'enhancement' ELSE 'bug' END as[bugeco.type]
+		  ,component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + a.[id] url
+		  /*
+		  adding into this section the ccb fieds that are common across various teneants first
+		  */
+		  ,[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,[bugeco.ccb_eta] as [ccb_eta]
+		  ,[bugeco.ccb_order] as [ccb_order]
+		  ,[bugeco.ccb_por] as [ccb_por]
+		  ,[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,[bugeco.ccb_status] as [ccb_status]
+		  ,[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,[bugeco.release_found]
+		  ,null as supplier_org
+		  ,CASE WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec')THEN 'PreSiBugs'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE      WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') and component like '%iom.fw%' THEN  'SW/FW PreSiBug Found by IP'
+		  WHEN  [bugeco.team_found] in ('valid.ip', 'valid.ss.typec') THEN  'HW PreSiBug Found by IP'
+		  WHEN [bugeco.env_found] like '%silicon%' and component like '%iom.fw%' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like '%silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN ([bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation')and component like '%iom.fw%' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN [bugeco.env_found] = 'simulation.soc' or [bugeco.env_found] ='simulation.dft.soc' or [bugeco.env_found]  = 'emulation' THEN 'HW PreSiBug Found by SoC'
+		  WHEN component like '%iom.fw%' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END as [old_is_found_bySoc]
+		  ,CASE WHEN [bugeco.env_found] like '%silicon%' and  from_tenant  ='heia_soc' and from_subject = 'sighting' THEN 1 ELSE 0 END as IsCount
+		  ,CASE WHEN ww_submitted_date &lt; '2020ww01' THEN null ELSE [lineage] END as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE WHEN component like '%iom.fw%' THEN 'SW/FW'
+		  WHEN [heia_soc.bugeco.category]  in ('logic') THEN 'Functional'
+		  WHEN [heia_soc.bugeco.category]  in ('val') THEN 'VAL'
+		  WHEN [heia_soc.bugeco.category] is NULL or [heia_soc.bugeco.category] = '' THEN 'Other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,null as retro_status
+		  ,null  as retro_ip_escape
+		  ,null  as retro_global_learning
+		  ,null  as retro_global_action
+		  ,null  as retro_analysis
+		  ,null  as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,null as [generation]
+		  ,CASE WHEN status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected' and  [status_reason] in ('rejected.wont_fix', 'rejected.future_project', 'rejected.future_stepping')) THEN 1 ELSE 0 END as IsRealBug
+		  ,null as milestone
+		  ,1 as [totalID]
+		  , null as responseSLA
+		  , null as resolutionSLA
+		  ,null as [ww_sla_response_date]
+		  ,null as [ww_sla_resolution_date]
+		  ,null as [sla_response_date]
+		  ,null as [sla_resolution_date]
+		  ,null as [sla_response_met]
+		  ,null as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,null as  bar_type
+		  ,null as support_type
+
+		  from [DW.heia_soc.bugeco] a
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and [bugeco.type]='bug' /*this is old data so no need to bring in enhancement bug*/
+		  and component like '%icl%' and component like '%typec%'
+		  /*and component like '%iom.fw%' Comment this out to bring in FWSW bug*/
+		  and left(ww_submitted_date,4) = '2019'
+
+		  UNION ALL
+		  /*CICG data - Gen3 and after Gen3 bugs and no need to bring in FWSW in this one. Confirmed with Andrea*/
+		  select
+		  a.[tenant]
+		  ,a.ww
+		  ,a.closed_date
+		  ,a.[server.bugeco.repo_modified_date_WWxy] as repo_modified_wwd
+		  ,a.family as [original_family]
+		  ,b.[family]
+		  ,a.priority
+		  ,b.supplier as [ip_supplier]
+		  ,a.[release] as release
+		  ,a.[release_affected]
+		  ,a.[tag]
+		  ,a.[status]
+		  ,a.[status_reason] as [status_detail]
+		  ,c.family  as [project]
+		  ,c.family  as [SoC Die]
+		  ,a.[id]
+		  ,a.[lineage]
+		  ,null as [original_lineage]
+		  ,a.[title]
+		  ,a. [ww_submitted_date]
+		  ,a.[submitted_date]
+		  ,a.[updated_date]
+		  ,datepart(ww,a.[updated_date]) as ww_updated_date
+		  ,a.[bugeco.env_found]
+		  ,a.[bugeco.team_found]
+		  ,CASE WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  ELSE [server.bugeco.collateral_type_server]
+		  END as [bug_category]
+		  ,[bugeco.bug_class]
+		  ,a.from_tenant
+		  ,a. from_subject
+		  ,a.[bugeco.type]
+		  ,a.component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + a.[id] url
+		  /*
+		  adding into this section the ccb fieds that are common across various teneants first
+		  */
+		  ,a.[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,a.[bugeco.ccb_eta] as [ccb_eta]
+		  ,a.[bugeco.ccb_order] as [ccb_order]
+		  ,a.[bugeco.ccb_por] as [ccb_por]
+		  ,a.[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,a.[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,a.[bugeco.ccb_status] as [ccb_status]
+		  ,a.[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,a.[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,a.[bugeco.ccb_workaround] as [ccb_workaround]
+		  /*
+		  end of section of the ccb fields that are common to bugeco in various tenants
+		  */
+		  ,null as [ccb_proposal]
+		  ,a.[server.bugeco.ccb_mode] as [ccb_mode]
+		  ,a.[server.bugeco.ccb_disposition_type] as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,a.[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,a.[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,a.[server.bugeco.ww_predrop_closure_date_sdg] as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,a.[bugeco.release_found]
+		  ,c.supplier_org
+		  ,CASE WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE WHEN [bugeco.env_found] like '%Silicon%' and ([bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%'or [bugeco.release_found] = 'ip-internal') THEN 'PostSiBug NoSoC'
+		  WHEN  [bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%' or [bugeco.release_found] = 'ip-internal' THEN 'HW PreSiBug Found by IP'
+		  WHEN   c.supplier_org &lt;&gt; 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN   c.supplier_org &lt;&gt; 'IPG' THEN 'HW PreSiBug Found by SoC'
+		  WHEN   c.supplier_org = 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  WHEN   c.supplier_org = 'IPG' THEN 'HW PreSiBug Found by IP'
+		  WHEN  [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END as [old_is_found_bySoc]
+		  ,CASE WHEN a.[bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  ,a.lineage as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  WHEN [server.bugeco.collateral_type_server] in ('rdl_only', 'tool') THEN 'Collateral'
+		  WHEN [server.bugeco.collateral_type_server] ='doc.arch' THEN 'Arch'
+		  WHEN [server.bugeco.collateral_type_server] ='doc' THEN 'DOC'
+		  WHEN [server.bugeco.collateral_type_server] ='rdl_func_phys' or [server.bugeco.collateral_type_server] like 'rtl%' or [server.bugeco.collateral_type_server] ='upf' THEN 'Functional'
+		  WHEN [server.bugeco.collateral_type_server] like 'phys%' THEN 'Physical'
+		  WHEN [server.bugeco.collateral_type_server] like 'val%' THEN 'VAL'
+		  WHEN [server.bugeco.collateral_type_server] ='' or [server.bugeco.collateral_type_server] is null or [server.bugeco.collateral_type_server]  = 'review' THEN 'other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,[server.bugeco.retro_status] as retro_status
+		  ,[server.bugeco.retro_ip_escape] as retro_ip_escape
+		  ,null as retro_global_learning
+		  ,null as retro_global_action
+		  ,[server.bugeco.retro_analysis] as retro_analysis
+		  ,[server.bugeco.retro_learnings] as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,'Gen3' as [generation]
+		  ,CASE WHEN a.status in ('approved', 'change_defined', 'complete', 'future',  'open', 'repo_modified') or
+		  (a.status = 'rejected' and status_reason in ('rejected.wont_fix', 'rejected.future_product', 'rejected.future_stepping')) THEN 1 ELSE 0 END as IsRealBug
+		  ,null as milestone
+		  ,1 as [totalID]
+
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,[server.bugeco.bar_type] as  bar_type
+		  ,null as support_type
+
+		  from [DW.server.bugeco] a
+		  left join [CACHED_server_release_data] b on a.release = b.[release]
+		  left join [CACHED_server_release_data] c on  a.[bugeco.release_found]  = c.[release]
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and b.supplier_org = 'IPG'
+		  and left(ww_submitted_date, 4) &gt;= 2019
+		  and  a.[server.bugeco.local_change_only] = 'yes'
+		  and  a.[bugeco.type] in ('bug', 'enhancement')
+		  and (a.[server.bugeco.generation]  in  ('10nm Wave 4', '7nm Wave 2', '7nm Wave 1', 'N/A') or  a.[server.bugeco.generation] is null or  a.[server.bugeco.generation] = '')
+		  /*and isnull(c.supplier_org, 0)  not in ('IPG')
+		  and [bugeco.release_found]&lt;&gt;'' and [bugeco.release_found] is not null and [bugeco.release_found] not like '%unknown%'*/
+		  and [server.bugeco.collateral_type_server] not in ('fw.workaround') /*no blank value hence no need to add [server.bugeco.collateral_type_server] is null or [server.bugeco.collateral_type_server] = ''*/
+		  and (b.[ip_type] &lt;&gt; 'services' or b.[ip_type] is null or b.[ip_type] = '')
+		  and b.family not like 'SDG_DDG_FIVR'
+
+		  UNION ALL
+		  /*CICG data - server tenant Wave3 HW data*/
+		  select
+		  a.[tenant]
+		  ,a.ww
+		  ,a.closed_date
+		  ,a.[server.bugeco.repo_modified_date_WWxy] as repo_modified_wwd
+		  ,a.family as [original_family]
+		  ,b.[family]
+		  ,a.priority
+		  ,b.supplier as [ip_supplier]
+		  ,a.release
+		  ,a.[release_affected]
+		  ,a.[tag]
+		  ,a.[status]
+		  ,a.[status_reason] as [status_detail]
+		  ,c.family  as [project]
+		  ,c.family  as [SoC Die]
+		  ,a.[id]
+		  ,a.[lineage]
+		  ,null as [original_lineage]
+		  ,a.[title]
+		  ,a. [ww_submitted_date]
+		  ,a.[submitted_date]
+		  ,a.[updated_date]
+		  ,datepart(ww,a.[updated_date]) as ww_updated_date
+		  ,a.[bugeco.env_found]
+		  ,a.[bugeco.team_found]
+		  ,CASE WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  ELSE [server.bugeco.collateral_type_server]
+		  END as [bug_category]
+		  ,[bugeco.bug_class]
+		  ,a.from_tenant
+		  ,a. from_subject
+		  ,a.[bugeco.type]
+		  ,a.component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + a.[id] url
+		  /*
+		  adding into this section the ccb fieds that are common across various teneants first
+		  */
+		  ,a.[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,a.[bugeco.ccb_eta] as [ccb_eta]
+		  ,a.[bugeco.ccb_order] as [ccb_order]
+		  ,a.[bugeco.ccb_por] as [ccb_por]
+		  ,a.[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,a.[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,a.[bugeco.ccb_status] as [ccb_status]
+		  ,a.[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,a.[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,a.[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,a.[server.bugeco.ccb_mode] as [ccb_mode]
+		  ,a.[server.bugeco.ccb_disposition_type] as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,a.[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,a.[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,a.[server.bugeco.ww_predrop_closure_date_sdg] as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,a.[bugeco.release_found]
+		  ,c.supplier_org
+		  ,CASE WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE WHEN [bugeco.env_found] like '%Silicon%' and ([bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%' or [bugeco.release_found] = 'ip-internal') THEN 'PostSiBug NoSoC'
+		  WHEN  [bugeco.release_found] ='' or [bugeco.release_found] is  null or[bugeco.release_found] like '%unknown%' or [bugeco.release_found] = 'ip-internal' THEN 'HW PreSiBug Found by IP'
+		  WHEN   c.supplier_org &lt;&gt; 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN   c.supplier_org &lt;&gt; 'IPG' THEN 'HW PreSiBug Found by SoC'
+		  WHEN   c.supplier_org = 'IPG' and [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  WHEN   c.supplier_org = 'IPG' THEN 'HW PreSiBug Found by IP'
+		  WHEN  [bugeco.env_found] like '%Silicon%' THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END as [old_is_found_bySoc]
+		  ,CASE WHEN a.[bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  ,a.lineage as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  WHEN [server.bugeco.collateral_type_server] in ('rdl_only', 'tool') THEN 'Collateral'
+		  WHEN [server.bugeco.collateral_type_server] ='doc.arch' THEN 'Arch'
+		  WHEN [server.bugeco.collateral_type_server] ='doc' THEN 'DOC'
+		  WHEN [server.bugeco.collateral_type_server] ='rdl_func_phys' or [server.bugeco.collateral_type_server] like 'rtl%' or [server.bugeco.collateral_type_server] ='upf' THEN 'Functional'
+		  WHEN [server.bugeco.collateral_type_server] like 'phys%' THEN 'Physical'
+		  WHEN [server.bugeco.collateral_type_server] like 'val%' THEN 'VAL'
+		  WHEN [server.bugeco.collateral_type_server] ='' or [server.bugeco.collateral_type_server] is null or [server.bugeco.collateral_type_server]  = 'review' THEN 'other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,[server.bugeco.retro_status] as retro_status
+		  ,[server.bugeco.retro_ip_escape] as retro_ip_escape
+		  ,null as retro_global_learning
+		  ,null as retro_global_action
+		  ,[server.bugeco.retro_analysis] as retro_analysis
+		  ,[server.bugeco.retro_learnings] as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,'Wave3' as [generation]
+		  ,CASE WHEN a.status in ('approved', 'change_defined', 'complete', 'future',  'open', 'repo_modified') or
+		  (a.status = 'rejected' and status_reason in ('rejected.wont_fix', 'rejected.future_product', 'rejected.future_stepping')) THEN 1 ELSE 0 END as IsRealBug
+		  ,null as milestone
+		  ,1 as [totalID]
+
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,[server.bugeco.bar_type] as  bar_type
+		  ,null as support_type
+
+		  from [DW.server.bugeco] a
+		  left join [CACHED_server_release_data] b on a.release = b.[release]
+		  left join [CACHED_server_release_data] c on  a.[bugeco.release_found]  = c.[release]
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and b.supplier_org = 'IPG'
+		  and  a.[server.bugeco.local_change_only] = 'yes'
+		  and  a.[bugeco.type] in ('bug', 'enhancement')
+		  and [server.bugeco.collateral_type_server] not in('fw', 'fw.workaround')
+		  and (
+		  ( a.family  in (select distinct family from [cicg_wave3_family]) and a.[server.bugeco.generation]  ='Wave 3')
+		  OR
+		  (a.release in ('FIVR_ADL','FIVR_SPR','FIVR_PVC','FIVR_TGL'))
+		  )
+		  and a.release not in (select distinct release from [cicg_wave3_release])
+		  and (b.[ip_type] &lt;&gt; 'services' or b.[ip_type] is null or b.[ip_type] = '')
+
+		  UNION ALL
+		  /*CICG data - server tenant Wave1 and Wave2 HW data*/
+		  select
+		  a.[tenant]
+		  ,a.[ww]
+		  ,a.[closed_date]
+		  ,a.[server.bugeco.repo_modified_date_WWxy] as repo_modified_wwd
+		  ,a.[family] as [original_family]
+		  ,b.[family]
+		  ,a.[priority]
+		  ,b.[supplier] as [ip_supplier]
+		  ,a.[release]
+		  ,a.[release_affected]
+		  ,a.[tag]
+		  ,a.[status]
+		  ,a.[status_reason] as [status_detail]
+		  ,c.[family]  as [project]
+		  ,c.[family]  as [SoC Die]
+		  ,a.[id]
+		  ,a.[lineage]
+		  ,null as [original_lineage]
+		  ,a.[title]
+		  ,a. [ww_submitted_date]
+		  ,a.[submitted_date]
+		  ,a.[updated_date]
+		  ,datepart(ww,a.[updated_date]) as ww_updated_date
+		  ,a.[bugeco.env_found]
+		  ,a.[bugeco.team_found]
+		  ,CASE WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  ELSE [server.bugeco.collateral_type_server]
+		  END as [bug_category]
+		  ,[bugeco.bug_class]
+		  ,a.[from_tenant]
+		  ,a. from_subject
+		  ,a.[bugeco.type]
+		  ,a.[component]
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + a.[id] url
+		  ,NULL as [ccb_change_scope]
+		  ,NULL as [ccb_eta]
+		  ,NULL as [ccb_order]
+		  ,NULL as [ccb_por]
+		  ,NULL as [ccb_questionnaire]
+		  ,NULL as [ccb_status]
+		  ,NULL as [ccb_wontfix_action]
+		  ,NULL as [ccb_wontfix_reason]
+		  ,NULL                       AS [ccb_workaround]
+		  ,NULL                         AS [bugeco.ccb_prq_gating]
+		  ,NULL                         AS [ccb_proposal]
+		  ,NULL                         AS [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,[server.bugeco.ww_predrop_closure_date_sdg] as [ww_predrop_closure_date_sdg]
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,a.[bugeco.release_found]
+		  ,c.[supplier_org]
+		  ,CASE WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE
+		  WHEN [bugeco.env_found] like '%Silicon%'
+		  and (
+		  [bugeco.release_found] =''
+		  or [bugeco.release_found] is null
+		  or [bugeco.release_found] like '%unknown%'
+		  or [bugeco.release_found] = 'ip-internal'
+		  )
+		  THEN 'PostSiBug NoSoC'
+
+		  WHEN  [bugeco.release_found] =''
+		  or [bugeco.release_found] is  null
+		  or [bugeco.release_found] like '%unknown%'
+		  or [bugeco.release_found] = 'ip-internal'
+		  THEN 'HW PreSiBug Found by IP'
+
+		  WHEN   c.[supplier_org] &lt;&gt; 'IPG'
+		  and [bugeco.env_found] like '%Silicon%'
+		  THEN 'HW PostSiBug Found by SoC'
+
+		  WHEN   c.[supplier_org] &lt;&gt; 'IPG'
+		  THEN 'HW PreSiBug Found by SoC'
+
+		  WHEN   c.[supplier_org] = 'IPG'
+		  and [bugeco.env_found] like '%Silicon%'
+		  THEN 'PostSiBug NoSoC'
+
+		  WHEN   c.[supplier_org] = 'IPG'
+		  THEN 'HW PreSiBug Found by IP'
+
+		  WHEN  [bugeco.env_found] like '%Silicon%' /* -- No difference between this and above at 70 */
+		  THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END as [old_is_found_bySoc]
+
+		  ,CASE WHEN a.[bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  ,a.[lineage] as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE
+		  WHEN [server.bugeco.collateral_type_server] = 'debug_support' THEN 'support'
+		  WHEN [server.bugeco.collateral_type_server] in ('rdl_only', 'tool') THEN 'Collateral'
+		  WHEN [server.bugeco.collateral_type_server] ='doc.arch' THEN 'Arch'
+		  WHEN [server.bugeco.collateral_type_server] ='doc' THEN 'DOC'
+		  WHEN [server.bugeco.collateral_type_server] ='rdl_func_phys'
+		  or [server.bugeco.collateral_type_server] like 'rtl%'
+		  or [server.bugeco.collateral_type_server] ='upf'
+		  THEN 'Functional'
+		  WHEN [server.bugeco.collateral_type_server] like 'phys%' THEN 'Physical'
+		  WHEN [server.bugeco.collateral_type_server] like 'val%' THEN 'VAL'
+		  WHEN [server.bugeco.collateral_type_server] =''
+		  or [server.bugeco.collateral_type_server] is null
+		  or [server.bugeco.collateral_type_server]  = 'review'
+		  THEN 'other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,[server.bugeco.retro_status] as retro_status
+		  ,[server.bugeco.retro_ip_escape] as retro_ip_escape
+		  ,null as retro_global_learning
+		  ,null as retro_global_action
+		  ,[server.bugeco.retro_analysis] as retro_analysis
+		  ,[server.bugeco.retro_learnings] as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,'Wave1&amp;2' as [generation]
+		  ,CASE WHEN a.[status] in ('approved', 'change_defined', 'complete', 'future',  'open', 'repo_modified') or
+		  (a.[status] = 'rejected' and status_reason in ('rejected.wont_fix', 'rejected.future_product', 'rejected.future_stepping')) THEN 1 ELSE 0 END as IsRealBug
+		  ,null as milestone
+		  ,1 as [totalID]
+
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,[server.bugeco.bar_type] as  bar_type
+		  ,null as support_type
+
+		  from [DW.server.bugeco] a
+		  left join [CACHED_server_release_data] b on a.[release] = b.[release]
+		  left join [CACHED_server_release_data] c on  a.[bugeco.release_found]  = c.[release]
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and [bugeco.type] = 'bug'
+		  and a.[status] in ('change_defined', 'open', 'approved', 'future', 'repo_modified', 'complete', 'rejected')
+		  and [server.bugeco.generation] in ('Wave 1', 'Wave 2','Wave 1 and 2')
+		  and [server.bugeco.collateral_type_server] in ('fw', 'rdl_func_phys', 'rtl_func_only', 'rtl_func_phys', 'rtl_only', 'upf', 'doc', 'phys_circuit', 'phys_circuit_rtl', 'phys_only', 'phys_rtl', 'rdl_only', 'review', 'tool', 'val', 'val.bfm', 'val.checker', 'val.configuration', 'val.coverage', 'val.infrastructure', 'val.monitor', 'val.stress', 'val.test', 'doc.arch')
+		  and a.family in ('10nm SDG CGU', '10nm Server Chassis CTE', 'DFx Servers', 'IOSF Sideband', 'PMAX', 'SDG Cache', 'SDG DDR IO', 'SDG DRNG', 'SDG IIO', 'SDG MC', 'SDG Mesh', 'SDG MS2IDI SIP', 'SDG Rlink', 'SDG RTO', 'SDG SCF MS2IDI', 'SDG_DDG_FIVR', 'SYSIP_DFD', 'SYSIP_OOBMSM', 'SYSIP_RF', 'SYSIP_UBOX', 'DFx VISA Packetizer', 'SDG CHA','SYSIP_IOSF_Sideband_Bridge','SYSIP_PMA', 'SDG GPIO', 'SDG PLL', 'SYSIP_EBC', 'SYSIP_IEH', 'SDG Uniphy 10nm', 'SDG74 BGF', 'Clocking - DCA-DCS', 'SDG RCF_widgets', 'SDG CLKDIST', 'SDG DCS_cri_slv', 'SDG HSIO', 'SDG MS2IOSF', 'SYSIP_PUNIT')
+		  and (c.supplier_org &lt;&gt; 'ZBB' or c.supplier_org  is null or c.supplier_org  = '')
+
+
+		  UNION ALL
+		  /*MIG data - HIP tenant*/
+
+		  select
+		  [tenant]
+		  ,ww
+		  ,closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  ,[family]
+		  ,priority
+		  ,[hip.bugeco.ip_supplier] as [ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  , tag
+		  ,status
+		  , [status_reason] as [status_detail]
+		  , [hip.bugeco.project] as [project]
+		  , [hip.bugeco.project] as [SoC Die]
+		  , [id]
+		  , lineage
+		  ,null as [original_lineage]
+		  , title
+		  ,[ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as ww_updated_date
+		  , [bugeco.env_found]
+		  ,[bugeco.team_found]
+		  ,CASE WHEN [hip.bugeco.category] in ('Waiver','AV_Test_Tracking','Tracking','SD Support','Other') THEN 'support'
+		  ELSE [hip.bugeco.category]
+		  END as [bug_category]
+		  ,[bugeco.bug_class]
+		  , from_tenant
+		  , from_subject
+		  ,CASE WHEN [bugeco.type] ='enhancement' THEN 'enhancement' ELSE 'bug' END as[bugeco.type]
+		  ,[component]
+		  ,'https://hsdes.intel.com/home/default.html#article?id=' + id as url
+		  /*
+		  adding into this section the ccb fieds that are common across server and sip teneants first
+		  */
+		  ,[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,[bugeco.ccb_eta] as [ccb_eta]
+		  ,[bugeco.ccb_order] as [ccb_order]
+		  ,[bugeco.ccb_por] as [ccb_por]
+		  ,[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,[bugeco.ccb_status] as [ccb_status]
+		  ,[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*end of section of the ccb fields that are common to bugeco in various tenants*/
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  /*this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.*/
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,[bugeco.release_found]
+		  ,null as supplier_org
+		  ,CASE WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  ,CASE WHEN [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' and [hip.bugeco.category] = 'Firmware' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like'%silicon%' and [bugeco.team_found] like '%SoC%' THEN 'HW PostSiBug Found by SoC'
+		  WHEN [bugeco.env_found] like'%silicon%' and [hip.bugeco.category] = 'Firmware' THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'HW PostSiBug Found by IP'
+		  WHEN [bugeco.team_found] like '%SoC%' and [hip.bugeco.category] = 'Firmware' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN [bugeco.team_found] like '%SoC%' THEN 'HW PreSiBug Found by SoC'
+		  WHEN [hip.bugeco.category] = 'Firmware' THEN 'SW/FW PreSiBug Found by IP'
+		  ELSE 'HW PreSiBug Found by IP'
+		  END as[old_is_found_bySoc]
+		  ,CASE WHEN [bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  ,lineage as [lineage_final]
+		  ,null as IsSubIP
+		  ,CASE WHEN [hip.bugeco.category]in ('Waiver','AV_Test_Tracking','Tracking','SD Support','Other') THEN 'support'
+		  WHEN [hip.bugeco.category] = 'Firmware' THEN 'SW/FW'
+		  WHEN [hip.bugeco.category] like 'AV_%' THEN 'VAL'
+		  WHEN [hip.bugeco.category] ='documentation' THEN 'DOC'
+		  WHEN[hip.bugeco.category]='Ckt_BMOD' or
+		  ([hip.bugeco.category]='AV_GLS' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  ([hip.bugeco.category]='AV_Regression' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  [hip.bugeco.category]='Logic_Functional' or
+		  [hip.bugeco.category]='Logic_DFX' or
+		  ([hip.bugeco.category]='Logic_Assertion' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  ([hip.bugeco.category]='Logic_Emulation' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  ([hip.bugeco.category]='Logic_Static_Check' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  ([hip.bugeco.category]='Spec' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))or
+		  [hip.bugeco.category]='Arch' or
+		  [hip.bugeco.category]='Design_Other' or
+		  [hip.bugeco.category]='Physical/abstract' or
+		  [hip.bugeco.category]='Liberty/timing' or
+		  ([hip.bugeco.category]='BMOD' and [bugeco.root_cause]!='circuit') or
+		  ([hip.bugeco.category]='DFX'  and [bugeco.root_cause]!='circuit')or
+		  ([hip.bugeco.category]='Doc' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic')) or
+		  ([hip.bugeco.category]='Documentation' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic')) or
+		  ([hip.bugeco.category]='Emulation' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))  or
+		  [hip.bugeco.category]='GLS' or
+		  ([hip.bugeco.category]='Missing Data' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic' ))  or
+		  ([hip.bugeco.category]='Other Tool'and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))  or
+		  ([hip.bugeco.category]='Physical Layout' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic')) or
+		  ([hip.bugeco.category]='RTL Assertion' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic')) or
+		  [hip.bugeco.category]='RTL Functional' or
+		  ([hip.bugeco.category]='SD Support' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))  or
+		  ([hip.bugeco.category]='Timing' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))  or
+		  ([hip.bugeco.category]='' and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic')) or
+		  (([hip.bugeco.category] is null or [hip.bugeco.category]='')and ([bugeco.root_cause]='rtl' or [bugeco.root_cause]='logic'))
+		  then 'Functional'
+		  WHEN
+		  [hip.bugeco.category]='Ckt_Schematics' or
+		  [hip.bugeco.category]='Ckt_MSV' or
+		  ([hip.bugeco.category]='AV_GLS' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='AV_Regression' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Logic_Assertion' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Spec' and [bugeco.root_cause]='circuit')or
+		  ([hip.bugeco.category]='BMOD' and [bugeco.root_cause]='circuit') or
+		  [hip.bugeco.category]='Circuit' or
+		  ([hip.bugeco.category]='DFX' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Doc' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Documentation' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Physical Layout' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='RTL Assertion' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='SD Support' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='Timing' and [bugeco.root_cause]='circuit') or
+		  ([hip.bugeco.category]='' and [bugeco.root_cause]='circuit') or
+		  (([hip.bugeco.category] is null or[hip.bugeco.category]='')and [bugeco.root_cause]='circuit')
+		  then 'Physical' /*map to Physical per instruction from 2/5/21*/
+		  WHEN
+		  [hip.bugeco.category]='Ckt_Layout'  or
+		  [hip.bugeco.category]='Ckt_SIPD'  or
+		  [hip.bugeco.category]='BackEnd_PV'  or
+		  [hip.bugeco.category]='BackEnd_SD'  or
+		  [hip.bugeco.category]='BackEnd_Other'  or
+		  ([hip.bugeco.category]='Physical Layout' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic') or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='SD Support' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Timing' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = '')))
+		  then 'Physical' /*map to Physical per instruction from 2/5/21*/
+
+		  WHEN [hip.bugeco.category]='Release_QA' --then release collateral --is design collateral
+		  or [hip.bugeco.category]='Ckt_Collaterals' or
+		  [hip.bugeco.category]='AV_Checker' or
+		  ([hip.bugeco.category]='AV_GLS' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='AV_Regression' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  [hip.bugeco.category]='Logic_Collateral' or
+		  ([hip.bugeco.category]='Logic_Assertion' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Logic_Emulation' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Logic_Static_Check' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Spec' and (([bugeco.root_cause]!='ckt' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  [hip.bugeco.category]='BackEnd_Spec' or
+		  ([hip.bugeco.category]='Doc' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Documentation' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Other Tool' and (([bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='RTL Assertion' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  ([hip.bugeco.category]='Missing Data' and (([bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  [hip.bugeco.category]='Val Testbench' or
+		  [hip.bugeco.category]='Val Tool' or
+		  ([hip.bugeco.category]='' and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = ''))) or
+		  (([hip.bugeco.category] is null or [hip.bugeco.category]='' )and (([bugeco.root_cause]!='circuit' and[bugeco.root_cause]!='rtl'and [bugeco.root_cause]!='logic')or ([bugeco.root_cause] is null or [bugeco.root_cause] = '')))
+		  then 'Collateral'
+		  WHEN [hip.bugeco.category] in ('Power/RV', 'RV', 'Logic_BIOS') THEN 'Physical'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,[hip.bugeco.retro_status]as retro_status
+		  ,[hip.bugeco.retro_ip_escape]  as retro_ip_escape
+		  ,[hip.bugeco.retro_global_learning] as retro_global_learning
+		  ,[hip.bugeco.retro_global_action]  as retro_global_action
+		  ,[hip.bugeco.retro_analysis]  as retro_analysis
+		  ,[hip.bugeco.retro_learnings] as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or[ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,null as [generation]
+		  ,CASE WHEN [status] in ('open','approved' , 'change_defined', 'repo_modified', 'complete','future') OR
+		  (status = 'rejected' and  status_reason in ('rejected.wont_fix', 'rejected.future_stepping', 'rejected.future_product')) THEN 1 ELSE 0 END as IsRealBug
+		  ,[hip.bugeco.milestone] as milestone
+		  ,1 as totalID
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,null as  bar_type
+		  ,null as support_type
+
+		  from [DW.hip.bugeco]
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and ([hip.bugeco.ip_supplier] not in  ('2LM COE Obsolete','SVE','SIT','DDG PG Internal Project IP','NCSG IP','AN Analog Legacy','zObsolete','SLIC','CIG Non COE','PCH HIP','CRT','TBD/Unknown','na','N/A') or [hip.bugeco.ip_supplier] is null)
+		  /*and ([hip.bugeco.category] not in ('Waiver','AV_Test_Tracking','Tracking','SD Support','Other') or [hip.bugeco.category] is null )*/
+		  and ([Release] &lt;&gt;'LIB_Experiment' or [Release] is null )
+		  and [family] not like '%PCH%'
+		  and datepart(year,[submitted_date])&gt;= 2017
+
+		  UNION ALL
+		  /*---------------v_ipg_bug_fwsw with only tenant doesnt exist in v_ipg_bug---------------------------------------------------------*/
+
+		  /*ISH and LPSS external found data and Internal data found*/
+
+		  SELECT [tenant]
+		  ,ww
+		  ,closed_date
+		  ,null as repo_modified_wwd
+		  ,currentweek.[family]         AS [original_family]
+		  ,currentweek.[family]         AS [family]
+		  ,priority
+		  ,'System IO and Sensing FWSW'                         AS ip_supplier
+		  ,currentweek.[release]
+		  ,[release_affected]
+		  ,[tag]
+		  ,status
+		  ,[status_reason]              AS [status_detai]
+		  ,currentweek.release          AS [project]
+		  ,currentweek.release          AS [SoC Die]
+		  ,currentweek.[id]
+		  ,[lineage]
+		  ,NULL                         AS [original_lineage]
+		  ,[title]
+		  ,[ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as ww_updated_date
+		  ,currentweek.[bug.env_found]  AS [bugeco.env_found]
+		  ,[bug.team_found]             AS [bugeco.team_found]
+		  ,'SW/FW'                      AS [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,from_tenant
+		  ,from_subject
+		  ,[ip_fw_sw_sensing.bug.HSD_type]  as [bugeco.type]
+		  ,currentweek.component
+		  ,'https://hsdes.intel.com/home/default.html#article?id='
+		  + currentweek.[id]           url
+		  /*
+		  adding into this section the ccb fieds that are common across server and sip teneants first
+		  */
+		  ,NULL as [ccb_change_scope]
+		  ,NULL as [ccb_eta]
+		  ,NULL as [ccb_order]
+		  ,NULL as [ccb_por]
+		  ,NULL as [ccb_questionnaire]
+		  ,NULL as [ccb_status]
+		  ,NULL as [ccb_wontfix_action]
+		  ,NULL as [ccb_wontfix_reason]
+		  ,NULL                       AS [ccb_workaround]
+		  ,NULL                         AS [bugeco.ccb_prq_gating]
+		  ,NULL                         AS [ccb_proposal]
+		  ,NULL                         AS [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,null as [ww_defined_date]
+		  ,null as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,Datepart(ww, Getutcdate())   AS [currentww]
+		  ,Datepart(mm, Getutcdate())   AS [currentmonth]
+		  ,Datepart(yyyy, Getutcdate()) AS [currentyear]
+		  ,NULL                         AS [subip_family]
+		  ,NULL                         AS [subip_supplier]
+		  ,NULL                         AS [bugeco.release_found]
+		  ,NULL                         AS supplier_org
+		  ,CASE
+		  WHEN [bug.env_found] LIKE'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END                          AS [is_PreSiPostSi]
+		  ,CASE
+		  WHEN [bug.team_found] = 'COE' AND [bug.env_found] LIKE'%silicon%' THEN 'SW/FW PostSiBug Found by IP'
+		  WHEN [bug.team_found] = 'COE' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN [ip_fw_sw_sensing.bug.submitter_org] = 'CCG-CCE'
+		  AND [bug.env_found] LIKE'%silicon%' THEN
+		  'SW/FW PostSiBug Found by Customers'
+		  WHEN [ip_fw_sw_sensing.bug.submitter_org] = 'CCG-CCE' THEN
+		  'SW/FW PreSiBug Found by Customers'
+		  WHEN [bug.env_found] LIKE'%silicon%' THEN
+		  'SW/FW PostSiBug Found by SoC'
+		  ELSE 'SW/FW PreSiBug Found by SoC'
+		  END                          AS [old_is_found_bySoc]
+		  ,CASE
+		  WHEN [bugeco.env_found] LIKE '%silicon%' THEN 1
+		  ELSE 0
+		  END                          AS IsCount
+		  ,lineage                      AS [lineage_final]
+		  ,CASE
+		  WHEN component LIKE 'subip%' THEN 'SubIP'
+		  ELSE 'IP'
+		  END                          AS IsSubIP
+		  ,'SW/FW'                      AS [sub_bugcategory]
+		  ,NULL                         AS retro_status
+		  ,NULL                         AS retro_ip_escape
+		  ,NULL                         AS retro_global_learning
+		  ,NULL                         AS retro_global_action
+		  ,NULL                         AS [retro_analysis]
+		  ,NULL                         AS retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,datepart(ww, [ip_fw_sw_sensing.bug.repo_modified_date])                        AS [ww_repo_modified_date]
+		  , CASE WHEN [ip_fw_sw_sensing.bug.repo_modified_date] is null or [ip_fw_sw_sensing.bug.repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE datepart(ww,[ip_fw_sw_sensing.bug.repo_modified_date])
+		  END [BugFixedDoneDate]
+		  ,NULL                         AS [generation]
+		  ,CASE
+		  WHEN status IN ( 'open', 'change_defined', 'repo_modified', 'approved','future', 'complete' )
+		  OR ( status = 'rejected'
+		  AND [status_reason] IN ( 'rejected.wont_do', 'rejected.future_project', 'rejected.future_stepping'))
+		  THEN 1
+		  ELSE 0
+		  END                          AS IsRealBug
+		  ,NULL                         AS milestone
+		  ,1 AS totalID
+		  , null as responseSLA
+		  , null as resolutionSLA
+		  ,null as [ww_sla_response_date]
+		  ,null as [ww_sla_resolution_date]
+		  ,null as [sla_response_date]
+		  ,null as [sla_resolution_date]
+		  ,null as [sla_response_met]
+		  ,null as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,null as drop_fix
+		  ,[ip_fw_sw_sensing.bug.repo_modified_date] as [repo_modified_date]
+		  ,null as  bar_type
+		  ,null as support_type
+
+		  FROM   [dw.ip_fw_sw_sensing.bug] currentweek
+		  WHERE  1 = 1
+		  AND ww = Datepart(ww, Getutcdate())
+		  AND component NOT LIKE '%algo%'
+		  AND component NOT LIKE '%test%'
+		  /*and (status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected' and  [status_reason] in ('rejected.wont_do', 'rejected.future_project', 'rejected.future_stepping')))*/
+		  AND family IN ( 'ish', 'LPSS-Driver', 'THC-SW' )
+		  AND component NOT LIKE '%tool%'
+		  AND component NOT LIKE '%fdk%'
+		  AND component NOT LIKE '%manufacturing%'
+		  AND component NOT LIKE '%mfg%'
+		  AND component NOT LIKE '%installer%'
+		  AND component NOT LIKE '%eclite%'
+		  AND component NOT LIKE '%3rd party%'
+
+		  UNION ALL
+
+		  /*CICG data - server tenant Wave3 data for family SDG HMBIO*/
+
+		  SELECT a.TENANT
+		  ,a.ww
+		  ,a.closed_date
+		  ,a.[server.bugeco.repo_modified_date_WWxy] as repo_modified_wwd
+		  ,a.family                        AS [original_family]
+		  ,b.[family]
+		  ,a.priority
+		  ,b.supplier                      AS [ip_supplier]
+		  ,a. release
+		  ,a.[release_affected]
+		  ,a.tag
+		  ,a.[status]
+		  ,a.[status_reason]
+		  ,c.family                        AS [project]
+		  ,c.family                        AS [SoC Die]
+		  ,a.[id]
+		  ,a.[lineage]
+		  ,NULL                            AS [original_lineage]
+		  ,a.[title]
+		  ,a. [ww_submitted_date]
+		  ,a.[submitted_date]
+		  ,a.[updated_date]
+		  ,datepart(ww,a.[updated_date]) as ww_updated_date
+		  ,a.[bugeco.env_found]
+		  ,a.[bugeco.team_found]
+
+		  ,CASE
+		  WHEN[server.bugeco.collateral_type_server] LIKE 'FW%' THEN 'FW'
+		  ELSE [server.bugeco.collateral_type_server]
+		  END                             AS [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,a.from_tenant
+		  ,a.from_subject
+		  ,a.[bugeco.type]
+		  ,a.component
+		  ,'https://hsdes.intel.com/home/default.html#article?id='
+		  + a.[id]                        url
+		  /*
+		  adding into this section the ccb fieds that are common across various teneants first
+		  */
+		  ,a.[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,a.[bugeco.ccb_eta] as [ccb_eta]
+		  ,a.[bugeco.ccb_order] as [ccb_order]
+		  ,a.[bugeco.ccb_por] as [ccb_por]
+		  ,a.[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,a.[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,a.[bugeco.ccb_status] as [ccb_status]
+		  ,a.[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,a.[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,a.[bugeco.ccb_workaround] as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,a.[server.bugeco.ccb_mode] as [ccb_mode]
+		  ,a.[server.bugeco.ccb_disposition_type] as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,a.[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,a.[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,a.[server.bugeco.ww_predrop_closure_date_sdg] as ww_predrop_closure_date_sdg
+
+		  ,Datepart(ww, Getutcdate())      AS [currentww]
+		  ,Datepart(mm, Getutcdate())      AS [currentmonth]
+		  ,Datepart(yyyy, Getutcdate())    AS [currentyear]
+		  ,NULL                            AS [subip_family]
+		  ,NULL                            AS [subip_supplier]
+		  ,a.[bugeco.release_found]
+		  ,c.supplier_org
+		  ,CASE
+		  WHEN [bugeco.env_found] LIKE'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END                             AS [is_PreSiPostSi]
+		  ,CASE
+		  WHEN [bugeco.env_found] LIKE '%Silicon%'
+		  AND ( [bugeco.release_found] = ''
+		  OR [bugeco.release_found] IS NULL
+		  OR [bugeco.release_found] LIKE '%unknown%'
+		  OR [bugeco.release_found] = 'ip-internal' ) THEN
+		  'PostSiBug NoSoC'
+		  WHEN [bugeco.release_found] = ''
+		  OR [bugeco.release_found] IS NULL
+		  OR [bugeco.release_found] LIKE '%unknown%'
+		  OR [bugeco.release_found] = 'ip-internal'THEN
+		  'SW/FW PreSiBug Found by IP'
+		  WHEN c.supplier_org &lt;&gt; 'IPG'
+		  AND [bugeco.env_found] LIKE '%Silicon%' THEN
+		  'SW/FW PostSiBug Found by SoC'
+		  WHEN c.supplier_org &lt;&gt; 'IPG' THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN c.supplier_org = 'IPG'
+		  AND [bugeco.env_found] LIKE '%Silicon%' THEN 'PostSiBug NoSoC'
+		  WHEN c.supplier_org = 'IPG' THEN 'SW/FW PreSiBug Found by IP'
+		  WHEN [bugeco.env_found] LIKE '%Silicon%' THEN 'PostSiBug NoSoC'
+		  ELSE 'PreSiBug NoSoC'
+		  END                             AS [old_is_found_bySoc]
+		  ,CASE
+		  WHEN a.[bugeco.env_found] LIKE '%silicon%' THEN 1
+		  ELSE 0
+		  END                             AS IsCount
+		  ,a.lineage                       AS [lineage_final]
+		  ,NULL                            AS IsSubIP
+		  ,'SW/FW'                         AS[sub_bugcategory]
+		  ,[server.bugeco.retro_status]    AS retro_status
+		  ,[server.bugeco.retro_ip_escape] AS retro_ip_escape
+		  ,NULL                            AS retro_global_learning
+		  ,NULL                            AS retro_global_action
+		  ,[server.bugeco.retro_analysis]  AS retro_analysis
+		  ,[server.bugeco.retro_learnings] AS retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date]  AS [ww_repo_modified_date]
+		  ,CASE
+		  WHEN [ww_repo_modified_date] IS NULL
+		  OR [ww_repo_modified_date] = '' THEN
+		  Replace([ww_closed_date], 'ww', '')
+		  ELSE Replace([ww_repo_modified_date], 'ww', '')
+		  END                             [BugFixedDoneDate]
+		  ,'Wave3'                         AS [generation]
+		  ,CASE
+		  WHEN a.status IN ( 'approved', 'change_defined', 'complete', 'future','open', 'repo_modified' )
+		  OR ( a.status = 'rejected'
+		  AND status_reason IN ( 'rejected.wont_fix',
+		  'rejected.future_product',
+		  'rejected.future_stepping' ) ) THEN
+		  1
+		  ELSE 0
+		  END                             AS IsRealBug
+		  ,NULL                            AS milestone
+		  ,1 as [totalID]
+
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  ,[server.bugeco.bar_type] as  bar_type
+		  ,null as support_type
+
+		  FROM   [dw.server.bugeco] a
+		  LEFT JOIN [cached_server_release_data] b
+		  ON a.release = b.[release]
+		  LEFT JOIN [cached_server_release_data] c
+		  ON a.[bugeco.release_found] = c.[release]
+		  WHERE  1 = 1
+		  AND ww = Datepart(ww, Getutcdate())
+		  AND b.supplier_org = 'IPG'
+		  AND a.[server.bugeco.local_change_only] = 'yes'
+		  AND a.[bugeco.type] IN ( 'bug', 'enhancement' )
+		  AND a.family = 'SDG HBMIO'
+		  AND [server.bugeco.collateral_type_server] IN( 'fw', 'fw.workaround' )
+		  AND ( ( [server.bugeco.collateral_type_server] NOT IN( 'debug_support' )
+		  AND a.family IN (SELECT DISTINCT family
+		  FROM   [cicg_wave3_family])
+		  AND a.[server.bugeco.generation] = 'Wave 3' )
+		  OR ( [server.bugeco.collateral_type_server] NOT IN(
+		  'debug_support' )
+		  AND a.release IN ( 'FIVR_ADL', 'FIVR_SPR', 'FIVR_PVC',
+		  'FIVR_TGL' )
+		  ) )
+		  AND a.release NOT IN (SELECT DISTINCT release
+		  FROM   [cicg_wave3_release])
+
+		  UNION ALL
+
+		  /*CAVS and ACE data FWSW*/
+
+		  SELECT [tenant]
+		  ,ww
+		  ,closed_date
+		  ,null as repo_modified_wwd
+		  ,CASE
+		  WHEN currentweek.[release] LIKE 'ACE%' THEN 'cavs fwsw' /*discussed with Andrea on 7/21 meeting. Since we don't have an active family for ACE in the Carbon hence using cavs fwsw for now*/
+		  WHEN currentweek.release LIKE 'CAVS%' THEN 'cavs fwsw'
+		  ELSE currentweek.family
+		  END                          AS original_family
+		  ,CASE
+		  WHEN currentweek.[release] LIKE 'ACE%' THEN 'cavs fwsw' /*discussed with Andrea on 7/21 meeting. Since we don't have an active family for ACE in the Carbon hence using cavs fwsw for now*/
+		  WHEN currentweek.release LIKE 'CAVS%' THEN 'cavs fwsw'
+		  ELSE currentweek.family
+		  END                          AS family
+		  ,priority
+		  ,'Edge Accelerator FWSW'                    AS ip_supplier
+		  ,[release]
+		  ,[release_affected]
+		  ,tag
+		  ,status
+		  ,[status_reason]              AS [status_detail]
+		  , currentweek.release     AS [project]
+		  , currentweek.release     AS [SoC Die]
+		  ,currentweek.[id]
+		  ,[lineage]
+		  ,NULL                         AS [original_lineage]
+		  ,currentweek.[title]
+		  ,[ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as ww_updated_date
+		  ,currentweek.[bug.env_found]  AS [bugeco.env_found]
+		  ,[bug.team_found]             AS [bugeco.team_found]
+		  ,CASE
+		  WHEN [bug.report_type] = 'sighting_is_product_defect'
+		  AND [bug.closed_reason] LIKE '%FW%' THEN 'FW'
+		  WHEN [bug.report_type] = 'sighting_is_product_defect'
+		  AND [bug.closed_reason] LIKE '%SW%' THEN 'SW'
+		  ELSE [bug.team_found]
+		  END                          AS [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,from_tenant
+		  ,from_subject
+		  ,CASE
+		  WHEN [bug.type] = 'enhancement' THEN 'enhancement'
+		  ELSE 'bug'
+		  END                          AS[bugeco.type]
+		  ,currentweek.component
+		  ,'https://hsdes.intel.com/home/default.html#article?id='
+		  + currentweek.[id]           url
+		  ,NULL                       AS [ccb_change_scope]
+		  ,NULL                       as [ccb_eta]
+		  ,NULL                       as [ccb_order]
+		  ,NULL                       as [ccb_por]
+		  ,NULL                       as [ccb_questionnaire]
+		  ,NULL                       as [ccb_status]
+		  ,NULL                       as [ccb_wontfix_action]
+		  ,NULL                       as [ccb_wontfix_reason]
+		  ,NULL                       AS [ccb_workaround]
+		  ,NULL                       AS [bugeco.ccb_prq_gating]
+		  ,NULL                       AS [ccb_proposal]
+		  ,NULL                       AS [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,null as [ww_defined_date]
+		  ,null as [ww_approved_date]
+		  ,null as [ww_predrop_closure_date_sdg]
+		  ,Datepart(ww, Getutcdate())   AS [currentww]
+		  ,Datepart(mm, Getutcdate())   AS [currentmonth]
+		  ,Datepart(yyyy, Getutcdate()) AS [currentyear]
+		  ,NULL                         AS subip_family
+		  ,NULL                         AS subip_supplier
+		  ,NULL                         AS [bugeco.release_found]
+		  ,NULL                         AS [supplier_org]
+		  ,CASE
+		  WHEN currentweek.[bug.env_found] LIKE '%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END                          AS [is_PreSiPostSi]
+		  ,CASE WHEN currentweek.[bug.team_found] in ('customer','WOS') and [bug.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by Customers'
+		  WHEN currentweek.[bug.team_found] in ('customer','WOS') THEN 'SW/FW PreSiBug Found by Customers'
+		  WHEN currentweek.[bug.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') and [bug.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by SoC'
+		  WHEN currentweek.[bug.team_found] in ('WSIV', 'CSPV','GFX','iVE','VP') THEN 'SW/FW PreSiBug Found by SoC'
+		  WHEN [bug.env_found] like '%silicon%' THEN 'SW/FW PostSiBug Found by IP'
+		  ELSE 'SW/FW PreSiBug Found by IP'
+		  END as [old_is_found_bySoc]
+		  ,CASE
+		  WHEN [bug.env_found] LIKE '%silicon%' THEN 1
+		  ELSE 0
+		  END                          AS IsCount
+		  ,lineage                      AS [lineage_final]
+		  ,CASE
+		  WHEN component LIKE 'subip%' THEN 'SubIP'
+		  ELSE 'IP'
+		  END                          AS IsSubIP
+		  ,'SW/FW'                      AS[sub_bugcategory]
+		  ,NULL                         AS retro_status
+		  ,NULL                         AS retro_ip_escape
+		  ,NULL                         AS retro_global_learning
+		  ,NULL                         AS retro_global_action
+		  ,NULL                         AS [retro_analysis]
+		  ,NULL                         AS retro_learnings
+		  ,owner
+		  ,Datepart(ww, [closed_date])  AS ww_closed_date
+		  ,[bug.ww_implemented_date]    AS [ww_repo_modified_date]
+		  ,CASE
+		  WHEN [bug.ww_implemented_date] IS NULL
+		  OR [bug.ww_implemented_date] = '' THEN
+		  Datepart(ww, [closed_date])
+		  ELSE Replace([bug.ww_implemented_date], 'ww', '')
+		  END                          [BugFixedDoneDate]
+		  ,NULL                         AS generation
+		  ,CASE
+		  WHEN ( status IN ( 'open', 'change_defined', 'repo_modified',
+		  'approved',
+		  'future', 'complete', 'implemented' )
+		  OR ( status = 'rejected'
+		  AND [status_reason] IN ( 'rejected.wont_fix',
+		  'rejected.future_project',
+		  'rejected.future_stepping' ) ) )
+		  THEN 1
+		  ELSE 0
+		  END                          AS IsRealBug
+		  ,NULL                         AS milestone
+		  ,1 as[totalID]
+		  , null as responseSLA
+		  , null as resolutionSLA
+		  ,null as [ww_sla_response_date]
+		  ,null as [ww_sla_resolution_date]
+		  ,null as [sla_response_date]
+		  ,null as [sla_resolution_date]
+		  ,null as [sla_response_met]
+		  ,null as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,null as drop_fix
+		  ,null as [repo_modified_date]
+		  ,null as  bar_type
+		  ,null as support_type
+
+		  FROM   [dw.sfip.bug] currentweek
+		  WHERE  1 = 1
+		  AND ww = Datepart(ww, Getutcdate())
+		  /*and (status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete', 'implemented')
+		  or(status = 'rejected' and  [status_reason] in ('rejected.wont_fix', 'rejected.future_project', 'rejected.future_stepping')))*/
+		  /*update all code below to match with v_ipg_fwsw_bug data after working with Bart/Piotr*/
+		  and (
+		  ([bug.report_type] = 'sighting_is_product_defect' and (release like 'ACE%' or release like 'CAVS2_%')
+		  and [bug.closed_reason] in ('internal_sw_bug','internal_fw_bug')
+		  and submitted_date &lt;'03/01/2021' /*confirm this data with Bart on 3/22/22 */ )
+		  OR
+		  ((release LIKE '%cavs2_5%' OR release LIKE '%ACE%')
+		  AND (component = 'fw' OR component = 'sw' OR component = 'sw.driver.win')
+		  and submitted_date &gt;='03/01/2021'))
+
+		  UNION ALL
+
+		  /*adding the dw.ip_leadership.support for support bug tenant*/
+		  select
+		  [tenant]
+		  ,ww
+		  ,closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  ,[family]
+		  ,priority
+		  ,null as [ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  ,[tag]
+		  ,[status]
+		  ,[status_reason] as [status_detail]
+		  ,[ip_leadership.support.customer_project] as [project]
+		  ,[ip_leadership.support.customer_project] as [SoC Die]
+		  ,[id]
+		  ,[lineage]
+		  ,null as [original_lineage]
+		  ,[title]
+		  ,[ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww,[updated_date]) as [ww_updated_date]
+		  ,[ip_leadership.support.env_found] as [bugeco.env_found]
+		  ,null as [bugeco.team_found]
+		  ,'support' as [bug_category]
+		  ,null as [bugeco.bug_class]
+		  ,from_tenant
+		  ,from_subject
+		  ,[support.issue_type] as [bugeco.type]
+		  ,[component]
+		  ,'https://hsdes.intel.com/home/default.html#article?id=' + id as url
+		  /*
+		  adding into this section the ccb fieds that are common across server and sip teneants first
+		  */
+		  ,null as [ccb_change_scope]
+		  ,null as [ccb_eta]
+		  ,null as [ccb_order]
+		  ,null as [ccb_por]
+		  ,null as [ccb_prq_gating]
+		  ,null as [ccb_questionnaire]
+		  ,null as [ccb_status]
+		  ,null as [ccb_wontfix_action]
+		  ,null as [ccb_wontfix_reason]
+		  ,null as [ccb_workaround]
+		  ,null as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  /*
+		  this ends the section for ccb fields - NOTE that the ccb_propoal is only for the SIP tenant. ccb_mode and ccb_disposition_type are unique to the server tenant.
+		  */
+		  ,null as [ww_defined_date]
+		  ,null as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,null as [bugeco.release_found]
+		  ,null as supplier_org
+		  ,null as [is_PreSiPostSi]
+		  ,null as [old_is_found_bySoc]
+		  ,null as [IsCount]
+		  ,lineage as [lineage_final]
+		  ,null as IsSubIP
+		  ,'support' as [sub_bugcategory]
+		  ,null as retro_status
+		  ,null as retro_ip_escape
+		  ,null as retro_global_learning
+		  ,null as retro_global_action
+		  ,null as retro_analysis
+		  ,null as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,null as [ww_repo_modified_date]
+		  ,null as [BugFixedDoneDate]
+		  ,null as [generation]
+		  ,CASE
+		  WHEN status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or (status = 'rejected' and  [status_reason] in ('rejected.wont_do', 'rejected.future_project', 'rejected.future_stepping'))
+		  THEN 1
+		  ELSE 0
+		  END as [IsRealBug]
+		  ,null as milestone
+		  ,1 as [totalID]
+		  ,null as [responseSLA]
+		  ,null as [resolutionSLA]
+		  ,null as [ww_sla_response_date]
+		  ,null as [ww_sla_resolution_date]
+		  ,null as [sla_response_date]
+		  ,null as [sla_resolution_date]
+		  ,null as [sla_response_met]
+		  ,null as [sla_resolution_met]
+		  ,submitted_by
+		  ,updated_by
+		  ,null as [ingredient]
+		  ,null as [ww_future_date]
+		  ,[ip_leadership.support.drop_fix] as drop_fix
+		  ,null as [repo_modified_date]
+		  ,null as  bar_type
+		  ,[ip_leadership.support.support_type] as support_type
+		  from [DW.ip_leadership.support]
+		  where  1=1
+		  and ww = datepart(ww, getutcdate())
+		  and [ip_leadership.support.type] = 'support'
+
+		  /* --Add PDS Data
+		  UNION ALL
+		  select [tenant],ww,closed_date
+		  ,null as repo_modified_wwd
+		  ,family as [original_family]
+		  ,[family]
+		  ,priority
+		  ,null as[ip_supplier]
+		  ,[release]
+		  ,[release_affected]
+		  , [tag]
+		  ,[status]
+		  , null as [status_detail]
+		  ,null as [project]
+		  ,null as [SoC Die]
+		  ,[id]
+		  ,[lineage]
+		  ,null as [original_lineage]
+		  ,[title]
+		  , [ww_submitted_date]
+		  ,[submitted_date]
+		  ,[updated_date]
+		  ,datepart(ww, [updated_date]) as ww_updated_date
+		  ,[bugeco.env_found]
+		  ,[bugeco.team_found]
+		  , [server_platf_sip.bugeco.category] as [bug_category]
+		  ,[bugeco.bug_class]
+		  ,from_tenant
+		  , from_subject
+		  ,CASE WHEN [bugeco.type] ='enhancement' THEN 'enhancement' ELSE 'bug' END as[bugeco.type]
+		  ,component
+		  , 'https://hsdes.intel.com/home/default.html#article?id=' + [id] url
+		  ,[bugeco.ccb_change_scope] as [ccb_change_scope]
+		  ,[bugeco.ccb_eta] as [ccb_eta]
+		  ,[bugeco.ccb_order] as [ccb_order]
+		  ,[bugeco.ccb_por] as [ccb_por]
+		  ,[bugeco.ccb_prq_gating] as [ccb_prq_gating]
+		  ,[bugeco.ccb_questionnaire] as [ccb_questionnaire]
+		  ,[bugeco.ccb_status] as [ccb_status]
+		  ,[bugeco.ccb_wontfix_action] as [ccb_wontfix_action]
+		  ,[bugeco.ccb_wontfix_reason] as [ccb_wontfix_reason]
+		  ,[bugeco.ccb_workaround] as [ccb_workaround]
+		  , null as [ccb_proposal]
+		  ,null as [ccb_mode]
+		  ,null as [ccb_disposition_type]
+		  ,[bugeco.ww_defined_date] as [ww_defined_date]
+		  ,[bugeco.ww_approved_date] as [ww_approved_date]
+		  ,null as ww_predrop_closure_date_sdg
+		  ,datepart(ww, getutcdate()) as [currentww]
+		  ,datepart(mm, getutcdate()) as [currentmonth]
+		  ,datepart(yyyy, getutcdate()) as [currentyear]
+		  ,null as [subip_family]
+		  ,null as [subip_supplier]
+		  ,[bugeco.release_found]
+		  ,null as supplier_org
+		  ,CASE --WHEN [sip.bugeco.ingredient] = 'ip.typec.iom.fw.patch' THEN 'PreSiBugs'
+		  WHEN [bugeco.env_found] like'%silicon%' THEN 'PostSiBugs'
+		  ELSE 'PreSiBugs'
+		  END as [is_PreSiPostSi]
+		  , null as [old_is_found_bySoc]
+		  ,CASE WHEN [bugeco.env_found] like '%silicon%' THEN 1 ELSE 0 END as IsCount
+		  , [lineage] as [lineage_final]
+		  ,CASE WHEN component like 'subip%' THEN 'SubIP' ELSE 'IP' END as IsSubIP
+		  ,CASE WHEN [server_platf_sip.bugeco.category] = 'arch' THEN 'Arch'
+		  WHEN [server_platf_sip.bugeco.category] in ('dynamo','fpga','rdl', 'tfm') THEN 'Collateral'
+		  WHEN [server_platf_sip.bugeco.category]  in ('hw','phy','rtl','sd','upf') THEN 'Functional'
+		  WHEN [server_platf_sip.bugeco.category]  in ('sandbox', 'verif', 'vip') THEN 'VAL'
+		  WHEN [server_platf_sip.bugeco.category]  ='doc' THEN 'DOC'
+		  WHEN [server_platf_sip.bugeco.category] IN ( 'fw', 'sw' ) THEN 'SW/FW'
+		  WHEN [server_platf_sip.bugeco.category] in ('tracking', 'support') THEN 'support'
+		  WHEN [server_platf_sip.bugeco.category] in ('INVALID: change the component','subip','other','unknown') or [server_platf_sip.bugeco.category] is NULL or [server_platf_sip.bugeco.category] = '' THEN 'Other'
+		  ELSE 'tbd'
+		  END as [sub_bugcategory]
+		  ,null as retro_status
+		  ,null as retro_ip_escape
+		  ,null as retro_global_learning
+		  ,null as retro_global_action
+		  ,null as retro_analysis
+		  ,null as retro_learnings
+		  ,[owner]
+		  ,[ww_closed_date]
+		  ,[bugeco.ww_repo_modified_date] as [ww_repo_modified_date]
+		  , CASE WHEN [ww_repo_modified_date] is null or [ww_repo_modified_date] ='' THEN REPLACE([ww_closed_date],'ww','')
+		  ELSE REPLACE([ww_repo_modified_date], 'ww','')
+		  END [BugFixedDoneDate]
+		  ,null as [generation]
+		  ,CASE WHEN status in ('open', 'change_defined', 'repo_modified', 'approved', 'future', 'complete')
+		  or(status = 'rejected') THEN 1 ELSE 0 END IsRealBug
+		  ,[server_platf_sip.bugeco.milestone] as milestone
+		  ,1 as [totalID]
+		  ,[ww_sla_response_date] as responseSLA
+		  ,[ww_sla_resolution_date] as resolutionSLA
+		  ,[ww_sla_response_date]
+		  ,[ww_sla_resolution_date]
+		  ,[sla_response_date]
+		  ,[sla_resolution_date]
+
+		  ,CASE WHEN [sla_response_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_response_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_response_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_response_met]
+		  END as [sla_response_met]
+		  , CASE WHEN [sla_resolution_met] = 'T' THEN 'SLAMet'
+		  WHEN [sla_resolution_met] = 'P' THEN 'InPlay'
+		  WHEN [sla_resolution_met] = 'F' THEN 'SLAFailed'
+		  ELSE [sla_resolution_met]
+		  END as [sla_resolution_met]
+		  , submitted_by
+		  , updated_by
+		  , null as [ingredient]
+		  ,[server_platf_sip.bugeco.ww_future_date] as [ww_future_date]
+		  ,[bugeco.drop_fix] as drop_fix
+		  ,[bugeco.repo_modified_date] as [repo_modified_date]
+		  , null as bar_type
+		  ,null as support_type
+		  from [DW.server_platf_sip.bugeco]  -- server_platf_sip.bugeco
+		  where 1=1
+		  and ww = datepart(ww, getutcdate())
+		  and family in ('SMBus Controller_EIP', 'PCIe Controller_EIP', 'Data Streaming Accelerator_EIP')
+		  */
+
+		  )
+		  bug
+
+		  left join (select distinct name, producttype, 1 as flag from v_ipg_carbon_product where
+		  [producttype] = 'TestChip' OR name like '%test%' or name like '%TC%') testchip
+
+		  on [SoC Die] = testchip.name
+	  </Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">SiteName</Key>
+      <Value Type="String">IIL</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Path</Key>
+      <Value Type="String">
+		/Internal Views
+      </Value>
+    </Add>
+  </Configuration>
+  <Revision Type="Revision">
+    <Number Type="Int64">2</Number>
+  </Revision>
+</Template>

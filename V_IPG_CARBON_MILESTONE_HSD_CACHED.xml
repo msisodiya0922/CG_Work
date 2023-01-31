@@ -1,0 +1,50 @@
+﻿<Template Type="Template" Name="V_IPG_CARBON_MILESTONE_HSD_CACHED" Id="6f9b8df3-954e-4598-a3ea-ec848504235e">
+  <TemplateName Type="String">CachedModel</TemplateName>
+  <TemplateVersion Type="Version">3.0.1</TemplateVersion>
+  <ParentId Type="Guid">fc76f402-8029-4b76-906f-cc1f6934e618</ParentId>
+  <Description Type="String">
+  </Description>
+  <Owner Type="String">yshapira</Owner>
+  <UpdatedBy Type="String">yshapira</UpdatedBy>
+  <Configuration Type="Dictionary(String, Object)">
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Statement</Key>
+      <Value Type="String">
+	  select * from [V_IPG_CARBON_MILESTONE]  
+	  </Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Path</Key>
+      <Value Type="String">/Cached Tables</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">DataConnection</Key>
+      <Value Type="Guid">43378a47-b660-41a6-97f3-ad590109b1c2</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Schedule</Key>
+      <Value Type="Dictionary(String, Object)">
+        <Add Type="DictionaryEntry">
+          <Key Type="String">Format</Key>
+          <Value Type="String">TimeSpan</Value>
+        </Add>
+        <Add Type="DictionaryEntry">
+          <Key Type="String">Pattern</Key>
+          <Value Type="String">1:00:00</Value>
+        </Add>
+      </Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">PreferKeepExistingData</Key>
+      <Value Type="Boolean">True</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">SiteName</Key>
+      <Value Type="String">IIL</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">EtlExecutable</Key>
+      <Value Type="String">\\ger\ec\proj\ha\computing\ibi\Maintenance\Etl\3.6.0.9\iBI.Etl.CachedModel.Basic.exe</Value>
+    </Add>
+  </Configuration>
+</Template>

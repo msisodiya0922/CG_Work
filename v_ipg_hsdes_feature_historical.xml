@@ -1,0 +1,360 @@
+﻿<Template Type="Template" Name="v_ipg_hsdes_feature_historical" Id="61666f45-bd6f-46be-9cec-93a9fb4f4b3e">
+  <TemplateName Type="String">internalview</TemplateName>
+  <TemplateVersion Type="Version">1.0.0</TemplateVersion>
+  <ParentId Type="Guid">fc76f402-8029-4b76-906f-cc1f6934e618</ParentId>
+  <Description Type="String">
+  </Description>
+  <Owner Type="String">qtdao</Owner>
+  <UpdatedBy Type="String">qtdao</UpdatedBy>
+  <Configuration Type="Dictionary(String, Object)">
+    <Add Type="DictionaryEntry">
+      <Key Type="String">CommandText</Key>
+      <Value Type="String">
+
+select distinct
+tenant
+,duedate_ww
+,ww
+,[ww_submitted_date]
+,datepart(ww, getutcdate()) as [currentww]
+,[id]
+,[family]
+,[ip_supplier]
+,[SoC Die]
+,CASE WHEN [SoC Die] like 'Diamond Rapids%' THEN 'DMR'
+WHEN [SoC Die] like 'Granite Rapids%' THEN 'GNR'
+WHEN [SoC Die] like 'Lunar Lake%' THEN 'LNL'
+WHEN [SoC Die] like 'Meteor Lake%' THEN 'MTL'
+WHEN [SoC Die] like 'Sapphire Rapids%' THEN 'SPR'
+ELSE [SoC Die]
+END as [program]
+,status as [hsdes_jira_status]
+,[state]
+,CASE WHEN [state] is null or [state] = '' THEN status_mapping
+ELSE [state] END  as [status]
+,CASE WHEN status = 'rejected.merged' THEN 'rejected'
+ELSE [status]
+END as [HSDES Status]
+,main.status_reason
+,[feature.team_filed]
+,CASE WHEN [feature.team_filed] like 'ext%' THEN 'Customer'
+WHEN [feature.team_filed] like 'int%' THEN 'Internal'
+ELSE 'tbd'
+END as [summary_team_filed]
+,isFWSW
+,from_tenant
+,from_id
+,reason
+,[title]
+,[feature.pcr]
+,left([feature.por], 10000) as [reason_detail]
+,release_affected
+,Configuration
+,[feature.motivation]
+,submitted_by
+,CASE WHEN[priority] is null or [priority] = '' or [priority] = 'null' or [priority] = '~Unknown' THEN 'Undecided' ELSE [priority] END as [priority]
+,[owner]
+,[url]
+,[url] as [HSDES_Reference_Link]
+,[siip_category]
+,[stepping_fix]
+,SoC
+, tag
+,[component]
+,[ip_gen]
+,[pre_post_ip3]
+,[at_alpha]
+,[at_beta]
+,[at_prod]
+,[AlphaMilestoneID]
+,[BetaMilestoneID]
+,[ProdMilestoneID]
+,sdl_required
+,null as phase
+,null as product_owner
+,0 as alpha_releaseid
+,null as alpha_date
+,0 as alpha_releasekey
+,null as alpha_releasekey_url
+,0 as beta_releaseid
+,null as beta_date
+,0 as beta_releasekey
+,null as beta_releasekey_url
+,0 as prod_releaseid
+,null as prod_date
+,0 as prod_releasekey
+,null as prod_releasekey_url
+,null as [ReviewReadinessDate]
+,[feature.milestone_open]
+,1 as [totalID]
+from
+(
+/*CIG data*/
+select
+tenant
+,[sip.feature.fhas_has_eta] as duedate_ww
+,ww
+,CONVERT (INT,REPLACE([ww_submitted_date],'ww','')) as [ww_submitted_date]
+,latestversion.[id]
+, CASE WHEN family like 'CAVS%' THEN 'CAVS' ELSE family END as [family]
+,[sip.feature.ip_supplier] as [ip_supplier]
+,[sip.feature.project] as [SoC Die]
+,status
+,status_reason
+,CASE WHEN[sip.feature.state] = 'abandoned' THEN 'Abandoned'
+WHEN [sip.feature.state]= 'alpha' THEN 'Alpha'
+WHEN [sip.feature.state]= 'prod' THEN 'In Production'
+WHEN [sip.feature.state]= 'beta' THEN 'Beta'
+WHEN [sip.feature.state]= 'deferred' THEN 'Deferred'
+WHEN [sip.feature.state] = 'exploration' THEN 'Exploration'
+WHEN [sip.feature.state] = 'in_arch' THEN 'In Architecture'
+WHEN [sip.feature.state] = 'in_exec' THEN 'In Execution'
+WHEN [sip.feature.state] = 'new' THEN 'New'
+WHEN [sip.feature.state] = 'schedule' THEN 'Scheduled'
+WHEN [sip.feature.state] = 'rework' THEN 'Review Rework'
+ELSE [sip.feature.state]
+END as [state]
+,[feature.team_filed]
+,CASE WHEN [feature.team_filed] like '%fw%' or [feature.team_filed] like '%sw%' THEN 1 ELSE 0 END as isFWSW
+,from_tenant
+,from_id
+,reason
+,[title]
+,[feature.pcr]
+,[feature.por]
+,release_affected
+,release as Configuration
+,[feature.motivation]
+,submitted_by
+,[priority]
+,[owner]
+,'https://hsdes.intel.com/home/default.html#article?id=' + latestversion.id as [url]
+,CASE WHEN (latestversion.[feature.siip_category] = '' or latestversion.[feature.siip_category] is null) THEN 'BlankValue' ELSE latestversion.[feature.siip_category]  END as [siip_category]
+,[sip.feature.project_stepping] as [stepping_fix]
+,null as SoC
+, tag
+, [component]
+,[sip.feature.ip_gen] as [ip_gen]
+,[sip.feature.pre_post_ip3] as [pre_post_ip3]
+,[sip.feature.at_alpha] as [at_alpha]
+,[sip.feature.at_beta] as [at_beta]
+,[sip.feature.at_prod] as [at_prod]
+,CASE WHEN CHARINDEX('milestone_id=',[sip.feature.at_alpha])&gt;0
+THEN SUBSTRING([sip.feature.at_alpha],CHARINDEX('::::milestone_id=',[sip.feature.at_alpha])+17,(CHARINDEX('::::milestone=', [sip.feature.at_alpha])-CHARINDEX('::::milestone_id=',[sip.feature.at_alpha]))-17 )
+END as [AlphaMilestoneID]
+,CASE WHEN CHARINDEX('milestone_id=',[sip.feature.at_beta])&gt;0
+THEN SUBSTRING([sip.feature.at_beta],CHARINDEX('::::milestone_id=',[sip.feature.at_beta])+17,(CHARINDEX('::::milestone=', [sip.feature.at_beta])-CHARINDEX('::::milestone_id=',[sip.feature.at_beta]))-17 )
+END as [BetaMilestoneID]
+,CASE WHEN CHARINDEX('milestone_id=',[sip.feature.at_prod])&gt;0
+THEN SUBSTRING([sip.feature.at_prod],CHARINDEX('::::milestone_id=',[sip.feature.at_prod])+17,(CHARINDEX('::::milestone=', [sip.feature.at_prod])-CHARINDEX('::::milestone_id=',[sip.feature.at_prod]))-17 )
+END as [ProdMilestoneID]
+,isnull([feature.sec_sdl_required],[sip.feature.sdl_required]) as sdl_required
+,[feature.milestone_open]
+FROM [DW.sip.feature] main
+join (select id,[feature.siip_category] from [DW.sip.feature] where ww = datepart(ww, getutcdate())
+and family in (select old_family from ipg_old_family_cached)) latestversion
+on main.id = latestversion.id
+WHERE 1 = 1 and ww &gt; datepart(ww,getutcdate()-13*7)
+
+
+UNION ALL
+/*MIG IPs*/
+select
+tenant
+,[hip.feature.fhas_has_eta] as duedate_ww
+,ww
+,CONVERT (INT,REPLACE([ww_submitted_date],'ww','')) as [ww_submitted_date]
+,latestversion.[id]
+,[family]
+,[hip.feature.ip_supplier] as [ip_supplier]
+,[hip.feature.project] as [SoC Die]
+,status
+,status_reason
+,CASE WHEN[hip.feature.state] = 'abandoned' THEN 'Abandoned'
+WHEN [hip.feature.state]= 'alpha' THEN 'Alpha'
+WHEN [hip.feature.state]= 'prod' THEN 'In Production'
+WHEN [hip.feature.state]= 'beta' THEN 'Beta'
+WHEN [hip.feature.state]= 'deferred' THEN 'Deferred'
+WHEN [hip.feature.state] = 'exploration' THEN 'Exploration'
+WHEN [hip.feature.state] = 'in_arch' THEN 'In Architecture'
+WHEN [hip.feature.state] = 'in_exec' THEN 'In Execution'
+WHEN [hip.feature.state] = 'new' THEN 'New'
+WHEN [hip.feature.state] = 'schedule' THEN 'Scheduled'
+WHEN [hip.feature.state] = 'rework' THEN 'Review Rework'
+ELSE [hip.feature.state]
+END as [state]
+,[feature.team_filed]
+,CASE WHEN [feature.team_filed] like '%fw%' or [feature.team_filed] like '%sw%' THEN 1 ELSE 0 END as isFWSW
+,from_tenant
+,from_id
+,reason
+,[title]
+,[feature.pcr]
+,[feature.por]
+,release_affected
+,release as Configuration
+,[feature.motivation]
+,submitted_by
+,[priority]
+,[owner]
+,'https://hsdes.intel.com/home/default.html#article?id=' + latestversion.id as [url]
+,CASE WHEN (latestversion.[feature.siip_category] = '' or latestversion.[feature.siip_category] is null) THEN 'BlankValue' ELSE latestversion.[feature.siip_category]  END as [siip_category]
+,null as [stepping_fix]
+,null as SoC
+, tag
+,[component]
+,null as [ip_gen]
+,null as [pre_post_ip3]
+,[hip.feature.at_alpha] as [at_alpha]
+,[hip.feature.at_beta] as [at_beta]
+,[hip.feature.at_prod] as [at_prod]
+, CASE WHEN CHARINDEX('milestone_id=',[hip.feature.at_alpha])&gt;0
+THEN SUBSTRING([hip.feature.at_alpha],CHARINDEX('::::milestone_id=',[hip.feature.at_alpha])+17,(CHARINDEX('::::milestone=', [hip.feature.at_alpha])-CHARINDEX('::::milestone_id=',[hip.feature.at_alpha]))-17 )
+END as [AlphaMilestoneID]
+,CASE WHEN CHARINDEX('milestone_id=',[hip.feature.at_beta])&gt;0
+THEN SUBSTRING([hip.feature.at_beta],CHARINDEX('::::milestone_id=',[hip.feature.at_beta])+17,(CHARINDEX('::::milestone=', [hip.feature.at_beta])-CHARINDEX('::::milestone_id=',[hip.feature.at_beta]))-17 )
+END as [BetaMilestoneID]
+,CASE WHEN CHARINDEX('milestone_id=',[hip.feature.at_prod])&gt;0
+THEN SUBSTRING([hip.feature.at_prod],CHARINDEX('::::milestone_id=',[hip.feature.at_prod])+17,(CHARINDEX('::::milestone=', [hip.feature.at_prod])-CHARINDEX('::::milestone_id=',[hip.feature.at_prod]))-17 )
+END as [ProdMilestoneID]
+,[feature.sec_sdl_required]  as [sdl_required]
+,[feature.milestone_open]
+FROM [dw.hip.feature] main
+join (select id,[feature.siip_category] from [DW.hip.feature] where ww = datepart(ww, getutcdate())
+and([hip.feature.ip_supplier] not in  ('2LM COE','SVE','zObsolete','SLIC','CIG Non COE','PCH HIP','CRT','na','N/A') or [hip.feature.ip_supplier] is null)
+) latestversion
+on main.id = latestversion.id
+WHERE 1 = 1and ww &gt; datepart(ww,getutcdate()-13*7)
+
+UNION ALL
+
+/*CICG IPs*/
+select
+a.tenant
+,a.[server.feature.fhas_has_eta] as duedate_ww
+,a.ww
+,CONVERT (INT,REPLACE([ww_submitted_date],'ww','')) as [ww_submitted_date]
+,latestversion.[id]
+,b.[family] as [family]
+,b.[supplier] as [ip_supplier]
+,c.family as [SoC Die]
+,a.status
+,a.status_reason
+,null as [state]
+,a.[feature.team_filed]
+,CASE WHEN [feature.team_filed] like '%fw%' or [feature.team_filed] like '%sw%' THEN 1 ELSE 0 END as isFWSW
+,a.from_tenant
+,a.from_id
+,reason
+,[title]
+,[feature.pcr]
+,[feature.por]
+,a.release_affected
+,a.[release] as Configuration
+,[feature.motivation]
+,submitted_by
+,[priority]
+,[owner]
+,'https://hsdes.intel.com/home/default.html#article?id=' + latestversion.id as [url]
+,CASE WHEN (latestversion.[feature.siip_category] = '' or latestversion.[feature.siip_category] is null) THEN 'BlankValue' ELSE latestversion.[feature.siip_category]  END as [siip_category]
+,null as [stepping_fix]
+,null as SoC
+, tag
+,[component]
+,null as [ip_gen]
+,null as [pre_post_ip3]
+,null as [at_alpha]
+,null as [at_beta]
+,null as [at_prod]
+,null as [AlphaMilestoneID]
+,null as [BetaMilestoneID]
+,null as [ProdMilestoneID]
+,[feature.sec_sdl_required] as [sdl_required]
+,[feature.milestone_open]
+FROM [dw.server.feature] a
+left join cached_server_release_data b
+on a.release = b.release
+join (select distinct old_family, family, 'yes' as [isipgfamily] from v_ipg_family_gladius) d
+on b.family =d.old_family
+join (select id,[feature.siip_category], isnull([server.feature.Requesting_Project],from_release) as Requesting_Project, [from_release] from [DW.server.feature] where ww = datepart(ww, getutcdate())
+and ([server.feature.external_links] NOT like '%jira%' or[server.feature.external_links] is null or [server.feature.external_links]  = '')
+) latestversion
+on a.id = latestversion.id
+left join cached_server_release_data c
+on latestversion.from_release = c.release or latestversion.Requesting_Project = c.release
+
+WHERE 1 = 1
+and ww &gt; datepart(ww,getutcdate()-13*7)
+/*and [feature.siip_category] = 'feature' Remove this line of code to bring in all feature tickets per discussion with Punit and Kristine based
+on the story: https://dev.azure.com/IPGDVM/IPG_DVM/_sprints/backlog/IPG_DVM%20Team/IPG_DVM/22'WW30.3-WW32.2?workitem=1632 */
+
+UNION ALL
+
+/*Sever_platf data*/
+select tenant
+,null as duedate_ww
+,ww
+,CONVERT (INT,REPLACE([ww_submitted_date],'ww','')) as [ww_submitted_date]
+,latestversion.[id]
+,[family]
+,null as [ip_supplier]
+,null as [SoC Die]
+,status
+,status_reason
+, null as [state]
+,[feature.team_filed]
+,CASE WHEN [feature.team_filed] like '%fw%' or [feature.team_filed] like '%sw%' THEN 1 ELSE 0 END as isFWSW
+,from_tenant
+,from_id
+,reason
+,[title]
+,[feature.pcr]
+,[feature.por]
+,release_affected
+,release as Configuration
+,[feature.motivation]
+,submitted_by
+,[priority]
+,[owner]
+,'https://hsdes.intel.com/home/default.html#article?id=' + latestversion.id as [url]
+,latestversion.[feature.siip_category] as [siip_category]
+,null as [stepping_fix]
+,null as SoC
+, tag
+,[component]
+,null as [ip_gen]
+,null as [pre_post_ip3]
+,null as [at_alpha]
+,null as [at_beta]
+,null as [at_prod]
+, null as [AlphaMilestoneID]
+,null as [BetaMilestoneID]
+,null as [ProdMilestoneID]
+,[feature.sec_sdl_required]  as [sdl_required]
+,[feature.milestone_open]
+FROM [dw.server_platf_sip.feature] server_platf
+join (select id,[feature.siip_category] from [DW.server_platf_sip.feature] where ww = datepart(ww, getutcdate())
+and family in (select old_family from ipg_old_family_cached)) latestversion
+on server_platf.id = latestversion.id
+WHERE 1 = 1 and ww &gt; datepart(ww,getutcdate()-13*7) 
+
+) main
+left join v_ipg_hsdes_jira_status_mapping map
+on main.status_reason = map.status_reason
+	  </Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">SiteName</Key>
+      <Value Type="String">ALL</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Path</Key>
+      <Value Type="String">
+    /Internal Views
+      </Value>
+    </Add>
+  </Configuration>
+  <Revision Type="Revision">
+    <Number Type="Int64">1</Number>
+  </Revision>
+</Template>
