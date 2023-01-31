@@ -1,0 +1,38 @@
+ 
+echo $XXCCMS_TOP
+chmod 777 *XXCCMSMOD014*
+
+mv -f XXCCMSMOD014.pks $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD014.pkb $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD014a.syn $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD014a.ugr $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD014b.syn $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD014b.ugr $XXCCMS_TOP/sql/
+
+#Connecting to Apps
+echo connecting to "$1"
+sqlplus -s "$1" <<EOF
+@$XXCCMS_TOP/sql/XXCCMSMOD014a.ugr
+exit
+EOF
+
+
+
+#Connecting to Custom Schema
+echo connecting to "$2"
+sqlplus -s "$2" <<EOF
+@$XXCCMS_TOP/sql/XXCCMSMOD014a.syn
+@$XXCCMS_TOP/sql/XXCCMSMOD014.pks
+@$XXCCMS_TOP/sql/XXCCMSMOD014.pkb
+@$XXCCMS_TOP/sql/XXCCMSMOD014b.ugr
+
+exit
+EOF
+
+#Connecting to Apps
+echo connecting to "$1"
+sqlplus -s "$1" <<EOF
+@$XXCCMS_TOP/sql/XXCCMSMOD014b.syn
+exit
+EOF
+

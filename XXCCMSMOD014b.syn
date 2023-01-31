@@ -1,0 +1,6 @@
+ 
+ 
+-- CREATE SYNONYM xxccms_employee_stg FOR xxccms.xxccms_employee_stg
+-- /
+CREATE SYNONYM xxccms_employeesync_pkg  FOR xxccms.xxccms_employeesync_pkg 
+/
