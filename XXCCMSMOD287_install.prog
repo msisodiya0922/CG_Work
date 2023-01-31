@@ -1,0 +1,35 @@
+#!/bin/ksh
+
+echo $XXCCMS_TOP
+chmod 777 *XXCCMSMOD287*
+
+mv -f AR_CUST_BAL_RPT_PKG.pkb  $XXCCMS_TOP/sql/
+mv -f AR_CUST_BAL_RPT_PKG.pks  $XXCCMS_TOP/sql/
+mv -f XXCCMSMOD287.xml         $XXCCMS_TOP/fndload/
+
+
+#Connecting to Apps
+echo connecting to "$1"
+sqlplus -s "$1" <<EOF
+@$XXCCMS_TOP/sql/AR_CUST_BAL_RPT_PKG.pks
+@$XXCCMS_TOP/sql/AR_CUST_BAL_RPT_PKG.pkb
+exit
+EOF
+
+# Uploading XML file to ARCUSBALSL Data defination
+
+java oracle.apps.xdo.oa.util.XDOLoader \
+                                UPLOAD \
+                                -DB_USERNAME apps\
+                                -DB_PASSWORD "$2"\
+                                -JDBC_CONNECTION "$3"\
+                                -LOB_TYPE DATA_TEMPLATE \
+                                -APPS_SHORT_NAME AR \
+                                -LOB_CODE ARCUSBALSL \
+                                -LANGUAGE en \
+                                -TERRITORY GB \
+                                -NLS_LANG American_America.AL32UTF8 \
+                                -XDO_FILE_TYPE XML \
+                                -FILE_CONTENT_TYPE text/xml \
+                                -FILE_NAME $XXCCMS_TOP/fndload/XXCCMSMOD287.xml \
+                                -CUSTOM_MODE FORCE
