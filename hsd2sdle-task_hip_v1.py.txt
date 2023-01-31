@@ -1,0 +1,185 @@
+import json 
+import requests
+import smtplib
+import datetime
+import urllib3
+import csv
+
+from requests_kerberos import HTTPKerberosAuth
+from requests.auth import HTTPBasicAuth
+
+from datetime import timedelta
+from email.mime.text import MIMEText
+
+import os
+from requests_ntlm import HttpNtlmAuth
+import getpass
+import urllib.parse
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import sys
+import urllib3
+# this is to ignore the ssl insecure warning as we are passing in 'verify=false'
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+headers = { 'Content-type': 'application/json' }
+ 
+url = 'https://hsdes-api.intel.com/rest/query/execution/eql?start_at=1'
+
+#get the all projects on SDL-E
+URL_projects = 'https://sdp-prod.intel.com/api/v2/projects/'
+		
+#response1 = requests.get(URL_projects, verify=False, headers={'Authorization': 'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'}) # mssisodi user Token
+response1 = requests.get(URL_projects, verify=False, headers={'Authorization': 'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+all_projects = response1.json()	
+
+#print(all_projects)
+
+
+##########################################################
+# Query to fetch the data entered by user to be updated
+##########################################################
+command1 = """select DISTINCT [release]
+from [ES.hip.feature]
+where [status] IN ('por','por-1')
+and [feature.sec_sdl_required] = 'yes'
+and [submitted_date] >  '01/01/2019'
+"""
+# and [sip.feature.ip_gen] IN ( 'CSME 4.11','ESE 2.1')  ,'PMA 1.0','LPSS_5.2'
+############################################################################
+## Fetches records to be updated with dates
+###########################################################################
+response = requests.get(
+#    'https://ibi-daas.lc.intel.com/daas/web/services/sql?command='+ urllib.parse.quote(command),
+   'https://ibi-daas.lc.intel.com/daas/web/services/sql?command='+ urllib.parse.quote(command1),
+    verify=False,
+    auth=HttpNtlmAuth('mssisodi', 'Nmumbai!!22'))
+
+j = response.content
+d = json.loads(j)
+
+#########################################################################
+# Run through the query to fetch the records and update as needed
+#########################################################################
+for i in d['Data']:
+    if i['release']:
+        print('IP Release NAME -- ' +i['release']) 
+        ipgen = i['release']
+        payload = "{\"eql\"" + ":" + "\"select id, title, owner, release where tenant = " + "'hip'" + " and subject = " + "'feature'" + " and release = '" + i['release'] + "' and submitted_date > " + "'01/01/2019'"  + " and feature.sec_sdl_required = " + "'yes'" + " and hip.feature.status IN " + "('por','por-1')" + "\"" + "}"
+        response2 = requests.post(url, verify=False,auth=HTTPKerberosAuth(), headers = headers, data = payload)
+		#response2 = requests.post(url, verify=False,auth=HTTPBasicAuth('rkannava', 'L539DC/AU7rE0tzN6m8nxIrSW1q7Q4VQWzoLSrhGYSESyEfM='), headers = headers, data = payload)
+        print(response2.status_code)
+        if (response2.status_code == 200):
+            data_rows = response2.json()['data']
+			#print (data_rows)
+            for hsd in data_rows:
+				#print(hsd['id'])
+                #print(hsd['owner'])                
+                hsd_article = "https://hsdes.intel.com/appstore/article/#/"+hsd['id']
+				#print (ipgen)
+                print (hsd_article)
+                    
+                print(hsd['release'].lower())
+                for project in all_projects ['results']:
+
+                    if hsd['release'].lower() in project["name"].lower():					
+                        print(project["name"])
+                        print(project["id"])
+					
+                        if "Project Status::Development" in project["tags"]:
+                            print(project["name"])
+						
+                            URL_survey = "https://sdp-prod.intel.com/api/v2/projects/" + str(project["id"]) + "/survey/"
+							
+                            #response3 = requests.get(URL_survey, verify=False, headers={'Authorization': 'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})
+                            response3 = requests.get(URL_survey, verify=False, headers={'Authorization': 'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+                            survey = response3.json()				
+							
+							#CA216 is HW solution wile CA215 is SW/FW solution in survey response				
+                            if (survey["survey_complete"]) and ("CA216" in survey["answers"]):
+
+                                print(survey["survey_complete"])
+                                print (survey)
+
+                                URL_tasks = "https://sdp-prod.intel.com/api/v2/projects/" + str(project["id"]) + "/tasks/?include=tags&expand=text,status"
+								#print(URL_tasks)
+								
+								# SDL-e api-endpoint 
+								#URL_tasks = 'https://sdp-prod.intel.com/api/v2/projects/7996/tasks/'
+				
+                                #response4 = requests.get(URL_tasks, verify=False, headers={'Authorization': 'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})
+                                response4 = requests.get(URL_tasks, verify=False, headers={'Authorization': 'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+                                all_tasks = response4.json()
+								#print (all_tasks)
+								
+                                feature_already_on_sdle = 0
+
+                                for task in all_tasks['results']:	
+                                    if hsd['id'] in task["title"]:
+                                        feature_already_on_sdle = 1
+                                        break
+
+                                if feature_already_on_sdle == 0:
+								
+                                    print("Creating new SDL-E tasks")
+                                    arch_title = "HSD#" + hsd['id'] + " : " + "Review Feature Security Architecture"
+                                    design_title = "HSD#" + hsd['id'] + " : " + "Analyze Feature Security and Privacy Design"
+                                    val_title = "HSD#" + hsd['id'] + " : " + "Validate Feature Security Pre-Silicon"
+
+                                    evidence_link = "https://sdl-e.app.intel.com/evidence?sId" + "=" + str(project["id"])
+                                    print (evidence_link)
+									
+                                    arch_text = "Feature Title: " + hsd['title'] + " ---- Requirement: Review all assigned/completed HWS1 tasks with your assigned Product Security Expert/Security Champion as applicable for this feature. You may need to update threat model or complete crypto or privacy reviews depending on the complexity of this feature. New evidence may be required. Link to HSD feature article: " + hsd_article  + "   Link to upload optional evidence: " + evidence_link
+                                    design_text = "Feature Title: " +  hsd['title'] + " ---- Requirement: Review all assigned/completed HWS2 tasks with your assigned Product Security Expert/Security Champion as applicable for this feature. New evidence may be required. Link to HSD feature article: " + hsd_article  + "   Link to upload optional evidence: " + evidence_link
+                                    val_text = "Feature Title: " +  hsd['title'] + " ---- Requirement: Review all assigned/completed HWS3 tasks with your assigned Product Security Expert/Security Champion as applicable for this feature. You may need to update security and privacy validation plan. New evidence may be required.  Link to HSD feature article: " + hsd_article  + "   Link to upload optional evidence: " + evidence_link
+									
+									#print(arch_title)	
+									#print(arch_text)
+									#print(design_title)
+									#print(design_text)
+									#print(val_title)
+									#print(val_text)
+
+                                    cfg_tag = 'XT_' + 'ipcfg_' + hsd['release']
+                                    #gen_tag = 'XT_' + 'ipgen_' + hsd['sip.feature.ip_gen']
+                                    owner_tag = 'XT_' + 'owner_' + hsd['owner']
+									#print(cfg_tag)
+									#print(gen_tag
+									                                    										
+									#data_arch = {'title':arch_title, 'assigned_to':['raghudeep.kannavara@intel.com'], 'text':arch_text, 'phase':'CX1','priority':10,'tags':['F-HWS1']}
+                                    data_arch = {'title':arch_title, 'text':arch_text, 'phase':'CX1','priority':10,'tags':['XT_F-HWS1',cfg_tag,owner_tag]}                                    
+                                    data_design = {'title':design_title, 'text':design_text,'phase':'CX1','priority':10,'tags':['XT_F-HWS2',cfg_tag,owner_tag]}
+                                    data_val = {'title':val_title, 'text':val_text,'phase':'CX1','priority':10,'tags':['XT_F-HWS3',cfg_tag,owner_tag]}
+
+                                    URL_tasks = "https://sdp-prod.intel.com/api/v2/projects/" + str(project["id"]) + "/tasks/"
+									#r = requests.post(URL_tasks, verify=False, data=data_val, headers={'Authorization':'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})
+									#print(r)
+									#r = requests.post(URL_tasks, verify=False, data=data_design, headers={'Authorization':'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})		
+									#r = requests.post(URL_tasks, verify=False, data=data_arch, headers={'Authorization':'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})
+                                    r = requests.post(URL_tasks, verify=False, data=data_val, headers={'Authorization':'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+                                    r = requests.post(URL_tasks, verify=False, data=data_design, headers={'Authorization':'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token		
+                                    r = requests.post(URL_tasks, verify=False, data=data_arch, headers={'Authorization':'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+									
+                                    URL_pid = "https://sdp-prod.intel.com/api/v2/projects/" + str(project["id"])
+                                    #response5 = requests.get(URL_pid, verify=False, headers={'Authorization': 'Token 1fd81edb1ef43f138b0a0c446318f92536e36cb0'})
+                                    response5 = requests.get(URL_pid, verify=False, headers={'Authorization': 'Token f60e8349f8db1d46e88bd1600ef61b34b19928b8'})  # ip_sec user Token
+                                    project = response5.json()				
+                                    print (project["url"])
+									
+									#send the correct link
+                                    message = "New SDL-E tasks added to " + ipgen + ": " + project["url"] + "\n\nThese tasks are for sdl_required feature: " + hsd_article
+                                    msg = MIMEText(message)
+                                    msg['Subject'] = "New SDL-E task added to " + ipgen
+
+                                    s = smtplib.SMTP('Outlook.intel.com', 587)
+                                    s.starttls()
+									##		s.set_debuglevel(1)
+									#change to (your email, your password)
+									#s.login("raghudeep.kannavara@intel.com", "P@ssw0rd")
+									#change first parameter to
+									#s.sendmail("IPG.SECURITY@intel.com", "raghudeep.kannavara@intel.com", msg.as_string())
+									#s.sendmail("IPG.SECURITY@intel.com", hsd['owner'], msg.as_string())
+                                    s.quit()

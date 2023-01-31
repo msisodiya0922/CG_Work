@@ -1,0 +1,216 @@
+﻿<Template Type="Template" Name="v_ipg_feature_historical" Id="4d12fbfb-d903-4b52-907f-786c898547c0">
+  <TemplateName Type="String">internalview</TemplateName>
+  <TemplateVersion Type="Version">1.0.0</TemplateVersion>
+  <ParentId Type="Guid">fc76f402-8029-4b76-906f-cc1f6934e618</ParentId>
+  <Description Type="String">
+  </Description>
+  <Owner Type="String">andrewn1</Owner>
+  <UpdatedBy Type="String">andrewn1</UpdatedBy>
+  <Configuration Type="Dictionary(String, Object)">
+    <Add Type="DictionaryEntry">
+      <Key Type="String">CommandText</Key>
+      <Value Type="String">  
+
+/* starting on JIRA data */
+select  
+main.tenant
+,main.project
+,main.duedate
+, null as duedate_ww
+,main.reporter
+,main.ww
+,main.[ww_submitted_date] 
+,main.[currentww] 
+,main.[id]
+,main.key
+,main.feature_issuetype
+,main.feature_labels
+,main.ProjectURL
+,main.[IPFamily] 
+,main.[ip_supplier] 
+,main.[SoC Die] 
+,main.[SoC Die Name]
+,main.[Program]
+,main.hsdes_jira_status
+,main.state
+,main.[status]
+,'JIRA tickets' as [HSDES Status]
+,main.status_reason
+,main.[feature.team_filed]
+,main.[summary_team_filed]
+,main.isFWSW
+,main.from_tenant
+,null as [from_id]
+,main.reason
+,main.[title]
+,main.[feature.pcr]
+,main.release_affected 
+, CASE WHEN status in ('alpha','beta', 'In Production','Released', 'Scheduled') THEN configuration
+            WHEN configuration is not null or configuration &lt;&gt; '' THEN configuration 
+ELSE IPFamily END as  Configuration  /*this transformation is helping IE document Creation app to pull all rejected and non-committed jira features tickets */
+,alpha_configuration
+,alpha_configuration_url
+,beta_configuration
+,beta_configuration_url
+,prod_configuration
+,prod_configuration_url
+,main.[feature.motivation]
+,main.submitted_by 
+,main.[priority]
+,main.[owner] 
+,main.[url]
+,main.[HSDES_Reference_Link]
+,main.[siip_category]
+,main.[stepping_fix]
+,main.SoC
+,main.tag
+,main.[component]
+,main.[ip_gen]
+,main.[pre_post_ip3]
+,main.[at_alpha]
+,main.[at_beta]
+,main.[at_prod]
+,main.[AlphaMilestoneID]
+,main.[BetaMilestoneID]
+,main. [ProdMilestoneID]
+,main.[Submitted_Org]
+,main.[Stage_found]
+,main.[Actual_Trend_Date]
+,main.[sdl_required]
+,main.phase
+,main.product_owner 
+,main.alpha_releaseid 
+,main.alpha_date
+,main.alpha_releasekey
+,main.alpha_releasekey_url
+,main.beta_releaseid 
+,main.beta_date
+,main.beta_releasekey
+,main.beta_releasekey_url
+,main.prod_releaseid 
+,main.prod_date
+,main.prod_releasekey
+,main.prod_releasekey_url
+,main.[ReviewReadinessDate]
+,null as [feature.milestone_open]
+,main.[totalID]
+,main.[hsdes]
+,main.[reason_detail]
+,CASE WHEN 
+               main.feature_labels like '%CCB_Scoping_approved%' or 
+               main.feature_labels like '%CCB_Scope_HAS_scheduled%' or 
+               main.feature_labels like '%CCB_DMR%' or
+               main.feature_labels like '%CCB_HASDONE_No_Schedule%'
+THEN 'Yes'
+ELSE 'No'
+END as [post_EC_pending_CCB]
+
+from v_ipg_jira_feature_historical main
+
+UNION ALL
+
+select 
+tenant 
+,null as project
+,null as duedate
+,duedate_ww
+,null as reporter
+,ww
+,[ww_submitted_date]
+,[currentww] 
+,[id]
+,null as [key]
+,'Feature' as feature_issuetype
+,null as feature_labels
+,null as ProjectURL
+,[family]
+,[ip_supplier]
+,[SoC Die]
+,[Soc Die] as [Soc Die Name]
+,[Program]
+,[hsdes_jira_status]
+,[state]
+,[status]
+,[HSDES Status]
+,status_reason
+,[feature.team_filed]
+,[summary_team_filed] 
+,isFWSW
+,from_tenant
+,from_id
+,reason
+,[title]
+,[feature.pcr]
+,release_affected
+,Configuration 
+,null as alpha_configuration
+,null as alpha_configuration_url
+,null as beta_configuration
+,null as beta_configuration_url
+,null as prod_configuration
+,null as prod_configuration_url
+,[feature.motivation]
+,submitted_by
+,[priority]
+,[owner]
+,[url]
+,[HSDES_Reference_Link]
+,[siip_category]
+,[stepping_fix]
+,SoC
+,tag
+,[component]
+,[ip_gen]
+,[pre_post_ip3]
+,[at_alpha]
+,[at_beta]
+,[at_prod]
+,[AlphaMilestoneID]
+,[BetaMilestoneID]
+,[ProdMilestoneID]
+,null as Submitted_Org
+,null as Stage_found
+,null as Actual_Trend_Date
+,sdl_required
+,phase
+,product_owner
+,alpha_releaseid 
+,alpha_date
+,alpha_releasekey
+,alpha_releasekey_url
+,beta_releaseid 
+,beta_date
+,beta_releasekey
+,beta_releasekey_url
+,prod_releaseid 
+,prod_date
+,prod_releasekey
+,prod_releasekey_url
+,[ReviewReadinessDate]
+,[feature.milestone_open]
+,[totalID]
+,null as [hsdes]
+,[reason_detail]
+,null as [post_EC_pending_CCB]
+
+from v_ipg_hsdes_feature_historical
+
+
+
+      </Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">SiteName</Key>
+      <Value Type="String">ALL</Value>
+    </Add>
+    <Add Type="DictionaryEntry">
+      <Key Type="String">Path</Key>
+      <Value Type="String">
+		/Internal Views
+      </Value>
+    </Add>
+  </Configuration>
+  <Revision Type="Revision">
+    <Number Type="Int64">1</Number>
+  </Revision>
+</Template>
